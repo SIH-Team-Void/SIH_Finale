@@ -6,6 +6,7 @@
 
 .reg-body{
     background-color: rgba(225, 239, 245, 1);
+    font-family: "Poppins", sans-serif;
 }
 
 .reg-title , .reg-sub-titles span{

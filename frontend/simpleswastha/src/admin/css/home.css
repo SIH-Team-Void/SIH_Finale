@@ -11,6 +11,7 @@
 .home-body {
     background-color: rgba(225, 239, 245, 1);
     overflow: hidden;
+    font-family: "Poppins", sans-serif;
 }
   
 .home-main-container {

@@ -67,9 +67,9 @@ export default function drSc() {
               <input type="text" id="doctorName" name="doctorName" placeholder="Doctor Name" />
             </div>
             <div className="drSc-form-group">
-              <label htmlFor="drId">Doctor ID</label>
-              <input type="text" id="drId" name="drId" placeholder="Doctor ID" />
-            </div>
+            <label htmlFor="department">Department</label>
+            <input type="text" id="department" name="department" placeholder="Department" />
+          </div>
           </div>
 
           <div className="drSc-form-row">
@@ -83,11 +83,22 @@ export default function drSc() {
             </div>
           </div>
 
-          <div className="drSc-form-group">
-            <label htmlFor="department">Department</label>
-            <input type="text" id="department" name="department" placeholder="Department" />
+          <div className="drSc-form-row">
+            <div className="drSc-form-group">
+              <label htmlFor="education">Dr Contact No: </label>
+              <input type="number" id="education" name="education" placeholder="Doctor's Contact No" />
+            </div>
+            <div className="drSc-form-group">
+              <label htmlFor="imageUrl"> Dr Email</label>
+              <input type="email" id="imageUrl" name="imageUrl" placeholder="Doctor's Email" />
+            </div>
           </div>
-
+          <div className="drSc-form-row">
+          <div className="drSc-group">
+              <label htmlFor="drFee">Doctor Fee</label>
+              <input type="text" id="drFee" name="drFee" placeholder="Enter doctor's fee" />
+            </div>
+            </div>
           <button className="drSc-register-btn" id="submitButton">ADD DOCTOR</button>
         </form>
 
@@ -116,14 +127,6 @@ export default function drSc() {
             <div className="drSc-group">
               <label htmlFor="endTime">End Time</label>
               <input type="time" id="endTime" name="endTime" required />
-            </div>
-            <div className="drSc-group">
-              <label htmlFor="bookingFee">Booking Fee</label>
-              <input type="text" id="bookingFee" name="bookingFee" placeholder="Enter booking fee" />
-            </div>
-            <div className="drSc-group">
-              <label htmlFor="drFee">Doctor Fee</label>
-              <input type="text" id="drFee" name="drFee" placeholder="Enter doctor's fee" />
             </div>
           </div>
 
