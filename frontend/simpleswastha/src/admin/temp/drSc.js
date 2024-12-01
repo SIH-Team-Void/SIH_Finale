@@ -2,8 +2,54 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '../component/navbar';
 import '../css/drSc.css';
+import axios from 'axios';
 
 export default function drSc() {
+  const handleAddDoctor = async (e) => {
+    e.preventDefault();
+
+    const doctorData = {
+      doctor_name: e.target.doctorName.value,
+      doctor_id: e.target.drId.value,
+      education: e.target.education.value,
+      image_url: e.target.imageUrl.value,
+      department: e.target.department.value,
+    };
+
+    try {
+      // Ensure the full URL is correctly specified
+      const response = await axios.post('http://localhost:8000/api/doctors/', doctorData);
+      
+      // Handle success (e.g., show a success message)
+      console.log('Doctor added:', response.data);
+    } catch (error) {
+      console.error('Error adding doctor:', error.response ? error.response.data : error.message);
+      // Handle error (e.g., show an error message)
+    }    
+  };
+
+  const handleAddOPD = async (e) => {
+    e.preventDefault();
+
+    const appointmentData = {
+      doctor_id: e.target.doctorID.value,
+      doctor_name: e.target.doctor.value,
+      date: e.target.date.value,
+      start_time: e.target.startTime.value,
+      end_time: e.target.endTime.value,
+      booking_fee: e.target.bookingFee.value,
+      doctor_fee: e.target.drFee.value,
+    };
+
+    try {
+      await axios.post('/api/appointments/', appointmentData);
+      // Handle success (e.g., show a success message)
+    } catch (error) {
+      console.error('Error adding appointment:', error);
+      // Handle error (e.g., show an error message)
+    }
+  };
+
   return (
     <div className="drSc-body">
       <Navbar />
@@ -13,7 +59,7 @@ export default function drSc() {
           <Link to="/admin/opdSc" className="drSc-activity">Create New Doctor Schedule</Link>
         </div>
 
-        <form action="../../Back-end/DrSc_AddDr.php" method="POST">
+        <form onSubmit={handleAddDoctor}>
           <h3>Add Doctor</h3>
           <div className="drSc-form-row">
             <div className="drSc-form-group">
@@ -45,7 +91,7 @@ export default function drSc() {
           <button className="drSc-register-btn" id="submitButton">ADD DOCTOR</button>
         </form>
 
-        <form action="../../Back-end/DrSc_AddOPD.php" method="POST">
+        <form onSubmit={handleAddOPD}>
           <h3>OPD Appointment</h3>
           <div className="drSc-form-row">
             <div className="drSc-form-group">
