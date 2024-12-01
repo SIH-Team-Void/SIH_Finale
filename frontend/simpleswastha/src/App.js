@@ -10,8 +10,16 @@ import ManageBed from './admin/temp/manageBed';
 import HospAccount from './admin/temp/account';
 import DrSc from './admin/temp/drSc';
 import Inventory from './admin/temp/inventory';
-// import UserLogin from './user/temp/';
-// import GovernmentHome from './goverment/temp/';
+import UserLogin from './user/temp/userLogin';
+import UserHome from './user/temp/userHome';
+import UserBedBook from './user/temp/bedBook';
+import UserBedCat from './user/temp/bedCat';
+import UserOPD from './user/temp/opd';
+import UserOPDDr from './user/temp/opdDr';
+import UserOPDDrSc from './user/temp/opdDrSc';
+import UserAccount from './user/temp/userAccount';
+import UserGoverSc from './user/temp/govermentSc';
+import GovernmentMap from './goverment/temp/hospitalsMap';
 
 function App() {
   return (
@@ -33,10 +41,19 @@ function App() {
           <Route path="/admin/account" element={<HospAccount />} />
 
           {/* User Portal */}
-          {/* <Route path="/user" element={<UserLogin />} /> */}
+          <Route path="/user" element={<UserLogin />} />
+          <Route path="/user/Home" element={<UserHome />} />
+          <Route path="/user/bedBook" element={<UserBedBook />} />
+          <Route path="/user/bedCat" element={<UserBedCat />} />
+          <Route path="/user/opd" element={<UserOPD />} />
+          <Route path="/user/opdDr" element={<UserOPDDr />} />
+          <Route path="/user/opdDrSc" element={<UserOPDDrSc />} />
+          <Route path="/user/userAccount" element={<UserAccount />} />
+          <Route path="/user/govermentSc" element={<UserGoverSc />} />
 
           {/* Government Portal */}
           {/* <Route path="/government" element={<GovernmentHome />} /> */}
+          <Route path="/government" element={<GovernmentMap />} />
 
           {/* Catch-All Route */}
           <Route path="*" element={<div>404 - Page Not Found</div>} />
