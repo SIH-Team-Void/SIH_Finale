@@ -1,4 +1,4 @@
-import React from 'react'
+/*import React from 'react'
 import "../css/goveSc.css";
 import Navbar from '../goverComponents/goveNav';
 import { Link } from 'react-router-dom';
@@ -16,11 +16,19 @@ export default function goveSc() {
             <div className="goveSc-form-row">
               <div className="goveSc-form-group">
                 <label htmlFor="bedCost">Scheme Name</label>
-                <input type="text" id="bedCost" name="bed_cost" placeholder="Scheme Name" required />
+                <input
+                 type="text"
+                 id="bedCost"
+                  name="bed_cost"
+                   placeholder="Scheme Name" required />
               </div>
               <div className="goveSc-form-group">
-                <label htmlFor="bedNo">Upload the scheme document</label>
-                <input type="file" id="ward_img" name="ward_img" placeholder="Upload the scheme document" required />
+                <label htmlFor="bedCost">Scheme URL</label>
+                <input
+                 type="url"
+                 id="bedCost"
+                  name="bed_cost"
+                   placeholder="Scheme Info Link" required />
               </div>
             </div>
             <div className="goveSc-form-group">
@@ -30,97 +38,71 @@ export default function goveSc() {
               </div>
             </div>
 
-            {/* New Inputs Section */}
+            {
             <div className="goveSc-form-row">
               <div className="goveSc-form-group">
                 <label htmlFor="state">Select State</label>
-                <select id="state" name="state" required>
-                  <option value="">Select State</option>
-                  <option value="rajasthan">Rajasthan</option>
-                  <option value="west-bengal">West Bengal</option>
-                  <option value="arunachal-pradesh">Arunachal Pradesh</option>
-                  <option value="andhra-pradesh">Andhra Pradesh</option>
-                  <option value="maharashtra">Maharashtra</option>
-                  <option value="chhattisgarh">Chhattisgarh</option>
-                </select>
+                
+                <input id="state" name="state" required>
+                  
+                </input>
               </div>
               <div className="goveSc-form-group">
                 <label htmlFor="age">Select Age</label>
-                <select id="age" name="age" required>
-                  <option value="">Select Age Group</option>
-                  <option value="0-13">0-13</option>
-                  <option value="13-18">13-18</option>
-                  <option value="18-25">18-25</option>
-                </select>
+                <input id="age" name="age" required>
+                  
+                </input>
               </div>
               <div className="goveSc-form-group">
                 <label htmlFor="income">Income Group</label>
-                <select id="income" name="income" required>
-                  <option value="">Select Income Group</option>
-                  <option value="0-117000">0 - 1,17,000</option>
-                </select>
+                <input id="income" name="income" required>
+                  
+                </input>
               </div>
               <div className="goveSc-form-group">
                 <label htmlFor="gender">Gender</label>
-                <select id="gender" name="gender" required>
-                  <option value="">Select Gender</option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                </select>
+                <input id="gender" name="gender" required>
+                  
+                </input>
               </div>
             </div>
 
             <div className="goveSc-form-row">
               <div className="goveSc-form-group">
                 <label htmlFor="familySize">Family Size</label>
-                <select id="familySize" name="familySize" required>
-                  <option value="">Select Family Size</option>
-                  {[...Array(10).keys()].map((num) => (
-                    <option key={num + 1} value={num + 1}>{num + 1}</option>
-                  ))}
-                </select>
+                <input id="familySize" name="familySize" required>
+                  
+                </input>
               </div>
               <div className="goveSc-form-group">
                 <label htmlFor="maritalStatus">Marital Status</label>
-                <select id="maritalStatus" name="maritalStatus" required>
-                  <option value="">Select Marital Status</option>
-                  <option value="married">Married</option>
-                  <option value="unmarried">Unmarried</option>
-                  <option value="widow">Widow</option>
-                </select>
+                <input id="maritalStatus" name="maritalStatus" required>
+                  
+                </input>
               </div>
               <div className="goveSc-form-group">
                 <label htmlFor="healthProblems">Health Problems</label>
-                <select id="healthProblems" name="healthProblems" required>
-                  <option value="">Select Health Problem</option>
-                  <option value="general">General</option>
-                  <option value="surgery">Surgery</option>
-                  <option value="cancer">Cancer</option>
-                  <option value="tb">TB</option>
-                  <option value="lab-test">Lab Test</option>
-                  <option value="heart-diseases">Heart Diseases</option>
-                  <option value="transplant">Transplant</option>
-                </select>
+                <input id="healthProblems" name="healthProblems" required>
+                  
+                </input>
               </div>
             </div>
 
             <div className="goveSc-form-group">
-              <label htmlFor="case">Case</label>
-              <select id="case" name="case" required>
-                <option value="">Select Case</option>
-                <option value="general">General</option>
-                <option value="minor">Minor</option>
-              </select>
+              <label htmlFor="case">Cast</label>
+              <input id="case" name="case" required>
+                
+              </input>
             </div>
 
-            {/* Submit Buttons */}
-            <button className="goveSc-register-btn" type="submit" id="submitButton">To all users</button>
-            <button className="goveSc-register-btn" type="submit" id="submitButton">To all hospitals</button>
+            
+            
+            <button className="goveSc-register-btn" type="submit" id="submitButton">Submit</button>
           </form>
         </div>
       </div>
 
-      {/* Existing Section */}
+      
       <section>
         <b className="goveSc-titles">Select Hospitals</b>
         <div className="goveSc-lowerSection">
@@ -131,7 +113,7 @@ export default function goveSc() {
             </div>
           </div>
           <div className="goveSc-hospital-list">
-            {/* Hospital Cards */}
+            
             <div className="goveSc-hospital-card">
               <img src={RajaImage} alt="Rajawadi Hospital" />
               <div className="goveSc-hospital-info">
@@ -144,10 +126,133 @@ export default function goveSc() {
                 </div>
               </div>
             </div>
-            {/* Repeat similar blocks for other hospitals */}
           </div>
         </div>
       </section>
     </div>
   )
 }
+*/
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import "../css/goveSc.css";
+import Navbar from "../goverComponents/goveNav";
+import axios from "axios";
+
+const GoveScForm = () => {
+    const [formData, setFormData] = useState({
+        schemeName: "",
+        schemeUrl: "",
+        schemeDescription: "",
+        userState: "",
+        userAge: "",
+        income: "",
+        gender: "",
+        familySize: "",
+        maritalStatus: "",
+        healthProblems: "",
+        caste: "",
+    });
+
+    const navigate = useNavigate();
+
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        console.log("Form Data Submitted:", formData);
+        try {
+            const response = await axios.post("http://localhost:8000/api/schemes/", formData);
+            console.log('Scheme Added:', response.data);
+            if (response.status === 201) {
+                // Successfully added
+                navigate("/display");
+            } else {
+                alert("Error submitting the form");
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            alert("There was an issue submitting the form. Please try again.");
+        }
+    };
+
+    return (
+        <div className="goveSc-body">
+            <Navbar />
+            <div className="goveSc-form-container">
+                <h3 className="goveSc-title">ADD NEW SCHEME</h3>
+                <form onSubmit={handleSubmit}>
+                    <div className="goveSc-form-row">
+                        <div className="goveSc-form-group">
+                            <label>Scheme Name</label>
+                            <input
+                                type="text"
+                                name="schemeName"
+                                placeholder="Scheme Name"
+                                value={formData.schemeName}
+                                onChange={handleChange}
+                                
+                            />
+                        </div>
+                        <div className="goveSc-form-group">
+                            <label>Scheme URL</label>
+                            <input
+                                type="url"
+                                name="schemeUrl"
+                                placeholder="Scheme Info Link"
+                                value={formData.schemeUrl}
+                                onChange={handleChange}
+                                
+                            />
+                        </div>
+                    </div>
+
+                    <div className="goveSc-form-group">
+                        <label>Scheme Description</label>
+                        <textarea
+                            name="schemeDescription"
+                            placeholder="Enter Scheme description"
+                            value={formData.schemeDescription}
+                            onChange={handleChange}
+                            rows="3"
+                            
+                        />
+                    </div>
+
+                    <div className="goveSc-form-row">
+                        {[
+                            { label: "Select State", name: "userState" },
+                            { label: "Select Age", name: "userAge" },
+                            { label: "Income Group", name: "income" },
+                            { label: "Gender", name: "gender" },
+                            { label: "Family Size", name: "familySize" },
+                            { label: "Marital Status", name: "maritalStatus" },
+                            { label: "Health Problems", name: "healthProblems" },
+                            { label: "Caste", name: "caste" },
+                        ].map((input) => (
+                            <div key={input.name} className="goveSc-form-group">
+                                <label>{input.label}</label>
+                                <input
+                                    type="text"
+                                    name={input.name}
+                                    placeholder={input.label}
+                                    value={formData[input.name]}
+                                    onChange={handleChange}
+                                    required
+                                />
+                            </div>
+                        ))}
+                    </div>
+
+                    <button className="goveSc-register-btn" type="submit">
+                        Submit
+                    </button>
+                </form>
+            </div>
+        </div>
+    );
+};
+
+export default GoveScForm;
