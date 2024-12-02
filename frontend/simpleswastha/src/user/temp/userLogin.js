@@ -63,7 +63,13 @@ export default function UserLogin() {
           </button>
         </div>
         <div className="userLog-right-container">
-          <p id="reg-log"><b>REGISTER</b> TO GET STARTED</p>
+        <p className="login-line1">
+            <b>Start with Your Registration</b>
+          </p>
+          <Link to="/user/signup">
+            <button className="userLog-RegBut">Create Account</button>
+          </Link>
+          <p>For Existing User</p>
           <div className="userLog-form-container">
             <div className="userLog-options">
               <button className="userLog-activity active" id="loginTab">Log In</button>
