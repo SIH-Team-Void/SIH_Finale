@@ -70,15 +70,19 @@ class HospitalLoginView(APIView):
     permission_classes = [AllowAny]
     
     def post(self, request):
-        # Hospital login logic
+        # Print out the received data for debugging
+        print("Received login data:", request.data)
+        
+        # Extract login credentials from request
         hosp_id = request.data.get('hosp_id')
         hosp_email = request.data.get('hosp_email')
-        hosp_password = request.data.get('hosp_password')
+        password = request.data.get('password')
         
         # Validate input
-        if not all([hosp_id, hosp_email, hosp_password]):
+        if not all([hosp_id, hosp_email, password]):
             return Response({
-                'error': 'Hospital ID, Email, and Password are required'
+                'error': 'Hospital ID, Email, and Password are required',
+                'received_data': request.data
             }, status=status.HTTP_400_BAD_REQUEST)
         
         try:
@@ -90,7 +94,7 @@ class HospitalLoginView(APIView):
             }, status=status.HTTP_401_UNAUTHORIZED)
         
         # Check password
-        if check_password(hosp_password, hospital.hosp_password):
+        if check_password(password, hospital.hosp_password):
             return Response({
                 'message': 'Login successful',
                 'hospital_name': hospital.hosp_name,

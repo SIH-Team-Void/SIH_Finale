@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     
+    'bed_management',
     'doctor_management.apps.DoctorConfig',
     'rest_framework',
     'corsheaders',
@@ -75,7 +76,8 @@ TEMPLATES = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  # React development server
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",# React development server
     # Add other origins as needed
 ]
 
@@ -87,6 +89,26 @@ CORS_ALLOW_METHODS = [
     'POST',
     'PUT',
 ]
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:3000',  # Add your React app's origin here
+    'https://localhost:3000', # You can also include https if you're using it in your local development
+]
+
+# settings.py
+CSRF_COOKIE_NAME = "csrftoken"
+CSRF_COOKIE_SECURE = False  # Set to True if using HTTPS
+CORS_ALLOW_CREDENTIALS = True  # Allow cookies to be sent with cross-origin requests
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [

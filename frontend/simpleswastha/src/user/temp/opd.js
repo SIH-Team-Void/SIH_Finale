@@ -40,9 +40,9 @@ export default function Opd() {
         <div className="opd-popular-cities">
           <p>
             Popular City People Search For:{" "}
-            <a href="#">Mumbai</a> <a href="#">Chennai</a>{" "}
+            {/* <a href="#">Mumbai</a> <a href="#">Chennai</a>{" "}
             <a href="#">Kolkata</a> <a href="#">Gorakhpur</a>{" "}
-            <a href="#">Bangalore</a> <a href="#">Delhi</a>
+            <a href="#">Bangalore</a> <a href="#">Delhi</a> */}
           </p>
         </div>
       </div>
