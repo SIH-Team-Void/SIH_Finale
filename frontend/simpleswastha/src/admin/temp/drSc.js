@@ -1,19 +1,21 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 import Navbar from '../component/navbar';
 import '../css/drSc.css';
-import axios from 'axios';
 
-export default function drSc() {
+export default function DrSchedule() {
   const handleAddDoctor = async (e) => {
     e.preventDefault();
 
     const doctorData = {
-      doctor_name: e.target.doctorName.value,
-      doctor_id: e.target.drId.value,
-      education: e.target.education.value,
-      image_url: e.target.imageUrl.value,
-      department: e.target.department.value,
+      doctor_name: e.target.elements.doctorName.value,
+      doctor_email: e.target.elements.drEmail.value,
+      doctor_phone: e.target.elements.drContact.value,
+      education: e.target.elements.education.value,
+      department: e.target.elements.department.value,
+      hospital_id: e.target.elements.hospitalId.value,
+      fees: e.target.elements.drFee.value
     };
 
     try {
@@ -31,21 +33,22 @@ export default function drSc() {
   const handleAddOPD = async (e) => {
     e.preventDefault();
 
-    const appointmentData = {
-      doctor_id: e.target.doctorID.value,
-      doctor_name: e.target.doctor.value,
-      date: e.target.date.value,
-      start_time: e.target.startTime.value,
-      end_time: e.target.endTime.value,
-      booking_fee: e.target.bookingFee.value,
-      doctor_fee: e.target.drFee.value,
+    const slotData = {
+      doctor_id: e.target.elements.doctorID.value,
+      day: e.target.elements.day.value,
+      start_time: e.target.elements.startTime.value,
+      end_time: e.target.elements.endTime.value,
+      interval: e.target.elements.interval.value, // Adding interval 
+      fees: e.target.elements.bookingFee.value,
+      hospital_id: e.target.elements.hospitalId.value
     };
 
     try {
-      await axios.post('/api/appointments/', appointmentData);
+      await axios.post('http://localhost:8000/api/slots/', slotData);
       // Handle success (e.g., show a success message)
+      console.log('Slot added successfully');
     } catch (error) {
-      console.error('Error adding appointment:', error);
+      console.error('Error adding slot:', error);
       // Handle error (e.g., show an error message)
     }
   };
@@ -64,73 +67,89 @@ export default function drSc() {
           <div className="drSc-form-row">
             <div className="drSc-form-group">
               <label htmlFor="doctorName">Doctor Name</label>
-              <input type="text" id="doctorName" name="doctorName" placeholder="Doctor Name" />
+              <input type="text" id="doctorName" name="doctorName" placeholder="Doctor Name" required />
             </div>
             <div className="drSc-form-group">
-            <label htmlFor="department">Department</label>
-            <input type="text" id="department" name="department" placeholder="Department" />
-          </div>
+              <label htmlFor="department">Department</label>
+              <input type="text" id="department" name="department" placeholder="Department" required />
+            </div>
           </div>
 
           <div className="drSc-form-row">
             <div className="drSc-form-group">
               <label htmlFor="education">Education</label>
-              <input type="text" id="education" name="education" placeholder="Doctor's Education" />
+              <input type="text" id="education" name="education" placeholder="Doctor's Education" required />
             </div>
             <div className="drSc-form-group">
-              <label htmlFor="imageUrl">Image URL</label>
-              <input type="text" id="imageUrl" name="imageUrl" placeholder="Image URL" />
+              <label htmlFor="hospitalId">Hospital ID</label>
+              <input type="number" id="hospitalId" name="hospitalId" placeholder="Hospital ID" required />
             </div>
           </div>
 
           <div className="drSc-form-row">
             <div className="drSc-form-group">
-              <label htmlFor="education">Dr Contact No: </label>
-              <input type="number" id="education" name="education" placeholder="Doctor's Contact No" />
+              <label htmlFor="drContact">Dr Contact No</label>
+              <input type="tel" id="drContact" name="drContact" placeholder="Doctor's Contact No" required />
             </div>
             <div className="drSc-form-group">
-              <label htmlFor="imageUrl"> Dr Email</label>
-              <input type="email" id="imageUrl" name="imageUrl" placeholder="Doctor's Email" />
+              <label htmlFor="drEmail">Dr Email</label>
+              <input type="email" id="drEmail" name="drEmail" placeholder="Doctor's Email" required />
             </div>
           </div>
+
           <div className="drSc-form-row">
-          <div className="drSc-group">
+            <div className="drSc-form-group">
               <label htmlFor="drFee">Doctor Fee</label>
-              <input type="text" id="drFee" name="drFee" placeholder="Enter doctor's fee" />
+              <input type="number" id="drFee" name="drFee" placeholder="Enter doctor's fee" required />
             </div>
-            </div>
-          <button className="drSc-register-btn" id="submitButton">ADD DOCTOR</button>
+          </div>
+
+          <button className="drSc-register-btn" type="submit">ADD DOCTOR</button>
         </form>
 
         <form onSubmit={handleAddOPD}>
-          <h3>OPD Appointment</h3>
+          <h3>OPD Slot</h3>
           <div className="drSc-form-row">
             <div className="drSc-form-group">
               <label htmlFor="doctorID">Doctor ID</label>
-              <input type="text" id="doctorID" name="doctorID" placeholder="Doctor ID" required />
+              <input type="number" id="doctorID" name="doctorID" placeholder="Doctor ID" required />
             </div>
             <div className="drSc-form-group">
-              <label htmlFor="doctor">Doctor Name</label>
-              <input type="text" id="doctor" name="doctor" placeholder="Doctor Name" required />
+              <label htmlFor="day">Day</label>
+              <input type="text" id="day" name="day" placeholder="Day of Week" required />
             </div>
           </div>
 
           <div className="drSc-form-row">
-            <div className="drSc-group">
-              <label htmlFor="date">Date</label>
-              <input type="date" id="date" name="date" required />
-            </div>
-            <div className="drSc-group">
+            <div className="drSc-form-group">
               <label htmlFor="startTime">Start Time</label>
               <input type="time" id="startTime" name="startTime" required />
             </div>
-            <div className="drSc-group">
+            <div className="drSc-form-group">
               <label htmlFor="endTime">End Time</label>
               <input type="time" id="endTime" name="endTime" required />
             </div>
           </div>
 
-          <button className="drSc-register-btn" id="submitButton">ADD OPD</button>
+          <div className="drSc-form-row">
+            <div className="drSc-form-group">
+              <label htmlFor="interval">Slot Interval</label>
+              <input type="text" id="interval" name="interval" placeholder="Slot Interval (e.g., 00:30:00)" required />
+            </div>
+            <div className="drSc-form-group">
+              <label htmlFor="bookingFee">Booking Fee</label>
+              <input type="number" id="bookingFee" name="bookingFee" placeholder="Booking Fee" required />
+            </div>
+          </div>
+
+          <div className="drSc-form-row">
+            <div className="drSc-form-group">
+              <label htmlFor="hospitalId">Hospital ID</label>
+              <input type="number" id="hospitalId" name="hospitalId" placeholder="Hospital ID" required />
+            </div>
+          </div>
+
+          <button className="drSc-register-btn" type="submit">ADD SLOT</button>
         </form>
       </div>
     </div>
