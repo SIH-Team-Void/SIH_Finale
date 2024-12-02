@@ -192,3 +192,5 @@ class Hospital(models.Model):
         verbose_name = "Hospital"
         verbose_name_plural = "Hospitals"
         ordering = ['-created_at']
+
+
