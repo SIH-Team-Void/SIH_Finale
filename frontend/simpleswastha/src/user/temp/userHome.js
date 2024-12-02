@@ -7,7 +7,7 @@ import HospitalBedImage from '../img/hospital-bed.png';
 import BedNextImage from '../img/bednext.png';
 import CalendarImage from '../img/calendar.png';
 import OPDNextImage from '../img/opdnext.png';
-import MedicineImage from '../img/medicine.png';
+import MedicineImage from '../img/govSc.png';
 import LabNextImage from '../img/labnext.png';
 
 export default function UserHome() {

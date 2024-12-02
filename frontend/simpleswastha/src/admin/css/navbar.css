@@ -20,6 +20,7 @@
     box-shadow: 0px 4px 2px -2px gray;
 }
 .nav-helpButton{
+    display: flex;
     background-color: rgba(240, 245, 225, 1);
     color: rgba(0, 0, 0, 1);
     padding: 15px 30px;
@@ -30,6 +31,13 @@
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease;
 }
+
+.nav-helpButton samp{
+    font-weight: 700;
+    margin-left: 5px;
+    margin-top: 2px;
+}
+
 .nav-helpButton:hover {
     transform: scale(1.05);
 }

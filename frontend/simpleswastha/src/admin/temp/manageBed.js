@@ -72,6 +72,8 @@ export default function ManageBed() {
           MANAGE BEDS
           </button>
           </Link>
+          <Link to="/admin/bedNo"> <button className="addBed-activity"> MANAGE REQUEST
+            </button></Link>
         </div>
         <div className="manageBed-content">
           <h3>Select Ward</h3>

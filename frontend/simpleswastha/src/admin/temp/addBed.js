@@ -16,6 +16,8 @@ export default function AddBed() {
             </Link>
           <Link to="/admin/manageBed"> <button className="addBed-activity"> MANAGE BEDS
             </button></Link>
+            <Link to="/admin/bedNo"> <button className="addBed-activity"> MANAGE REQUEST
+            </button></Link>
         </div>
         <div className="addBed-forminputs" id="formContent">
           <h3 className="addBed-title">ADD WARD DETAILS</h3>
