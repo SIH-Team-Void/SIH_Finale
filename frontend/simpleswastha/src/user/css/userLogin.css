@@ -85,9 +85,9 @@
 }
 
 .userLog-right-container p {
-    font-size: 24px;
-    margin-bottom: 0px;
-    margin-left: 60px;
+    font-size: 15px;
+    margin: 10px;
+    text-align: center;
     color: rgba(0, 0, 0, 1);
 }
 
@@ -271,3 +271,19 @@
     border-radius: 10px;
     margin-bottom: 5px;
   }
+
+  .userLog-RegBut{
+    background-color: rgba(223, 242, 170, 1);
+    color: black;
+    padding: 15px 120px;
+    border-radius: 25px 25px 25px 25px;
+    border-style: none;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+    font-weight: bold;
+    margin-left: 12%;
+}
+
+.userLog-RegBut:hover {
+    transform: scale(1.05);
+}

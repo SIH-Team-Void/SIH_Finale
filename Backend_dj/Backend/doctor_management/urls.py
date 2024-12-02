@@ -6,7 +6,6 @@ router = DefaultRouter()
 router.register(r'doctors', DoctorViewSet)
 router.register(r'slots', SlotViewSet)
 
-# Remove the 'api/' prefix here
 urlpatterns = [
     path('', include(router.urls)),
 ]
