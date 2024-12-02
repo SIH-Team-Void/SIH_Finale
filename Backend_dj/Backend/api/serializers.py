@@ -17,7 +17,7 @@ class HospitalRegistrationSerializer(serializers.ModelSerializer):
     
     def validate(self, data):
         # Password confirmation validation
-        if data['hosp_password'] != data['hosp_Cpassword']:
+        if data['hosp_password'] == data['hosp_Cpassword']:
             raise serializers.ValidationError({"hosp_Cpassword": "Passwords do not match."})
         
         # Remove confirm password field before saving

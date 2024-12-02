@@ -16,6 +16,7 @@ import UserHome from './user/temp/userHome';
 import UserBedBook from './user/temp/bedBook';
 import UserBedCat from './user/temp/bedCat';
 import UserOPD from './user/temp/opd';
+import UserSignUp from './user/temp/signUp';
 import UserOPDDr from './user/temp/opdDr';
 import UserOPDDrSc from './user/temp/opdDrSc';
 import UserAccount from './user/temp/userAccount';
@@ -54,6 +55,7 @@ function App() {
           <Route path="/user/opdDrSc" element={<UserOPDDrSc />} />
           <Route path="/user/userAccount" element={<UserAccount />} />
           <Route path="/user/govermentSc" element={<UserGoverSc />} />
+          <Route path="/user/signup" element={<UserSignUp />} />
 
           {/* Government Portal */}
           <Route path="/government" element={<GovernmentHome />} />

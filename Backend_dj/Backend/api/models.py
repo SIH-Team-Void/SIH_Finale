@@ -1,84 +1,11 @@
-# # from django.db import models
-# # from django.contrib.auth.hashers import make_password
-
-# # class Hospital(models.Model):
-# #     """
-# #     Model to represent hospital registration details
-# #     """
-# #     hosp_ID = models.IntegerField(unique=True, primary_key=True)
-# #     hosp_name = models.CharField(max_length=255)
-# #     hosp_email = models.EmailField(unique=True)
-# #     hosp_contact_no = models.CharField(max_length=20)
-# #     image_url = models.URLField(null=True, blank=True)
-    
-# #     # Location Details
-# #     hosp_lat = models.DecimalField(max_digits=9, decimal_places=6)
-# #     hosp_log = models.DecimalField(max_digits=9, decimal_places=6)
-# #     hosp_address = models.TextField()
-    
-# #     # Bed Capacity
-# #     hosp_no_of_beds = models.IntegerField()
-    
-# #     # Authentication
-# #     hosp_password = models.CharField(max_length=255)
-    
-# #     def save(self, *args, **kwargs):
-# #         # Hash the password before saving
-# #         if not self.pk or Hospital.objects.filter(pk=self.pk).hosp_password != self.hosp_password:
-# #             self.hosp_password = make_password(self.hosp_password)
-# #         super().save(*args, **kwargs)
-    
-# #     def __str__(self):
-# #         return f"{self.hosp_name} (ID: {self.hosp_ID})"
-
-
-# from django.db import models
-# from django.contrib.auth.hashers import make_password
-
-# class Hospital(models.Model):
-#     """
-#     Model to represent hospital registration details
-#     """
-#     hosp_ID = models.IntegerField(unique=True, primary_key=True)
-#     hosp_name = models.CharField(max_length=255)
-#     hosp_email = models.EmailField(unique=True)
-#     hosp_contact_no = models.CharField(max_length=20)
-#     image_url = models.URLField(null=True, blank=True)
-    
-#     # Location Details
-#     hosp_lat = models.DecimalField(max_digits=9, decimal_places=6)
-#     hosp_log = models.DecimalField(max_digits=9, decimal_places=6)
-#     hosp_address = models.TextField()
-    
-#     # Bed Capacity
-#     hosp_no_of_beds = models.IntegerField()
-    
-#     # Authentication
-#     hosp_password = models.CharField(max_length=255)
-    
-#     def save(self, *args, **kwargs):
-#         # Hash the password before saving
-#         if not self.pk:  # If this is a new object
-#             self.hosp_password = make_password(self.hosp_password)
-#         else:
-#             # If updating an existing object, check if the password has changed
-#             existing_hospital = Hospital.objects.filter(pk=self.pk).first()
-#             if existing_hospital and existing_hospital.hosp_password != self.hosp_password:
-#                 self.hosp_password = make_password(self.hosp_password)
-        
-#         super().save(*args, **kwargs)
-    
-#     def __str__(self):
-#         return f"{self.hosp_name} (ID: {self.hosp_ID})"
 from django.db import models
-from django.contrib.auth.hashers import make_password, check_password
 from django.core.validators import MinLengthValidator, EmailValidator
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 
 class Hospital(models.Model):
     """
-    Model to represent hospital registration details
+    Model to represent hospital registration details with password confirmation
     """
     # Unique Hospital Identifier
     hosp_ID = models.IntegerField(
@@ -137,12 +64,15 @@ class Hospital(models.Model):
     # Authentication
     hosp_password = models.CharField(
         max_length=255, 
-        verbose_name="Hashed Password"
+        verbose_name="Password"
     )
+
+    # Transient field for password confirmation (not stored in database)
+    _confirm_password = None
 
     # Timestamp Fields
     created_at = models.DateTimeField(
-        default=timezone.now,  # Use default instead of auto_now_add
+        default=timezone.now,
         verbose_name="Registration Date"
     )
 
@@ -155,35 +85,35 @@ class Hospital(models.Model):
         """
         Custom validation method
         """
-        # Additional custom validations can be added here
+        # Validation for number of beds
         if self.hosp_no_of_beds <= 0:
             raise ValidationError("Number of beds must be a positive integer")
+        
+        # Password confirmation validation
+        if self._confirm_password is not None:
+            if self.hosp_password != self._confirm_password:
+                raise ValidationError({
+                    '_confirm_password': "Passwords do not match."
+                })
 
-    def save(self, *args, **kwargs):
+    def set_confirm_password(self, confirm_password):
         """
-        Override save method to handle password hashing
+        Method to set the confirmation password for validation
         """
-        # Validate the model before saving
-        self.full_clean()
-
-        # Hash the password if it's not already hashed
-        if not self.pk or self._password_needs_hashing():
-            self.hosp_password = make_password(self.hosp_password)
-
-        super().save(*args, **kwargs)
-
-    def _password_needs_hashing(self):
-        """
-        Check if the password needs to be hashed
-        """
-        # If the password doesn't start with 'pbkdf2_', it needs hashing
-        return not self.hosp_password.startswith('pbkdf2_')
+        self._confirm_password = confirm_password
 
     def check_password(self, raw_password):
         """
-        Check if the provided password is correct
+        Simple password matching method
         """
-        return check_password(raw_password, self.hosp_password)
+        return self.hosp_password == raw_password
+
+    def save(self, *args, **kwargs):
+        """
+        Validate the model before saving
+        """
+        self.full_clean()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.hosp_name} (ID: {self.hosp_ID})"
@@ -192,5 +122,3 @@ class Hospital(models.Model):
         verbose_name = "Hospital"
         verbose_name_plural = "Hospitals"
         ordering = ['-created_at']
-
-
