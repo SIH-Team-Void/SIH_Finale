@@ -94,3 +94,89 @@
 .userAccount-change-password:hover {
     transform: scale(1.05);
 }
+
+/* The Modal (background) */
+.userAccount-modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+  }
+  
+  /* Modal Content Box */
+  .userAccount-modal-content {
+    background-color: #fefefe;
+    margin: 5% auto; /* 5% from top and centered */
+    padding: 20px;
+    border-radius: 25px; /* Rounded corners */
+    width: 70%; /* Adjust width as needed */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Close Button */
+  .userAccount-close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  
+  .userAccount-close:hover {
+    color: black;
+  }
+  
+  /* Form Styling */
+  .userAccount-form-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 2%; /* Add spacing between columns */
+    margin-top: 10px;
+  }
+  
+  .userAccount-form-group {
+    width: 48%; /* Half of the row for two-column layout */
+  }
+  
+  .userAccount-form-group label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    display: block;
+  }
+  
+  .userAccount-form-group input,
+  .userAccount-form-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 25px;
+    background-color: rgba(217, 217, 217, 1);
+    box-sizing: border-box;
+  }
+  
+  .userAccount-form-group input[type='date'] {
+    color: #555; /* Default color for date input */
+  }
+  
+  .userAccount-form-group button {
+    background-color: rgba(74, 123, 139, 1);
+    color: white;
+    padding: 10px 80px;
+    border-radius: 25px 25px 25px 25px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    margin-left: 80%;
+    margin-top: 5%;
+    transition: transform 0.3s ease;
+  }
+  
+  .userAccount-form-group button:hover {
+    transform: scale(1.05);
+  }
+  

@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import '../css/userNavbar.css';
+import '../css/goveNav.css';
 import logo from '../img/nav_logo.png';
-import bellIcon from '../img/notification.png';
+import noti from '../img/notification.png';
 
-export default function UserNavbar() {
+export default function GoveNav() {
   const [showNotifications, setShowNotifications] = useState(false);
 
   const toggleNotifications = () => {
@@ -18,25 +18,23 @@ export default function UserNavbar() {
   };
 
   return (
-    <div className="userNav-body" onClick={closeNotifications}>
-      <nav className="userNav">
-        <div className="userNav-logo">
+    <div className="goveNav-body" onClick={closeNotifications}>
+      <nav className="goveNav">
+        <div className="goveNav-logo">
           <img src={logo} alt="Simple Svastha" />
         </div>
-        <Link to="/user/home" className="userNav-active">Home</Link>
-        <Link to="/user/bedBook">Bed Booking</Link>
-        <Link to="/user/opd">OPD Appointment</Link>
-        <Link to="/user/govermentSc">Government Schemes</Link>
-        <Link to="/user/userAccount">Account</Link>
-        <button className="userNav-helpButton" onClick={toggleNotifications}> <img src={bellIcon} alt="Simple Svastha" />
-          <samp>NOTIFICATION</samp>
+        <Link to="/government" className="goveNav-active">Home</Link>
+        <Link to="/government/map">DCMS</Link>
+        <Link to="/government/schemes">Government Schemes</Link>
+        <button className="goveNav-helpButton" onClick={toggleNotifications}>
+          <img src={noti} alt="Simple Svastha" /> <samp>NOTIFICATION</samp>
         </button>
       </nav>
 
       {showNotifications && (
         <div className="notification-offcanvas">
           <div className="notification-header">
-            <img src={bellIcon} alt="Bell Icon" />
+            <img src={noti} alt="Bell Icon" />
             <h3>Notifications</h3>
             <button className="close-notification">×</button>
           </div>

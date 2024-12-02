@@ -13,7 +13,7 @@
 
 .hospMap-info-section {
   flex: 1;
-  background-color: #f2f4f8;
+  background-color:  rgba(219, 232, 210, 1);
   padding: 20px;
   box-shadow: -5px 0px 5px rgba(0, 0, 0, 0.1);
   display: flex;

@@ -1,20 +1,38 @@
 import React from 'react'
-import "../css/govermentSc.css";
-import Navbar from '../userComponents/userNavbar';
+import "../css/goveSc.css";
+import Navbar from '../goverComponents/goveNav';
+import { Link } from 'react-router-dom';
 import SearchIcon from '../img/search.png';
 import RajaImage from '../img/raja.png';
-import { Link } from 'react-router-dom';
 
-export default function govermentSc() {
+export default function goveSc() {
   return (
-    <div className='userGoveSc-body'>
+    <div className="goveSc-body">
       <Navbar />
-      <div className="userGoveSc-form-container">
-        <div className="userGoveSc-forminputs" id="formContent">
-          <h3 className="userGoveSc-title">View Government Schemes</h3>
+      <div className="goveSc-form-container">
+        <div className="goveSc-forminputs" id="formContent">
+          <h3 className="goveSc-title">ADD NEW SCHEME</h3>
           <form action="" method="">
-            <div className="userGoveSc-form-row">
-              <div className="userGoveSc-form-group">
+            <div className="goveSc-form-row">
+              <div className="goveSc-form-group">
+                <label htmlFor="bedCost">Scheme Name</label>
+                <input type="text" id="bedCost" name="bed_cost" placeholder="Scheme Name" required />
+              </div>
+              <div className="goveSc-form-group">
+                <label htmlFor="bedNo">Upload the scheme document</label>
+                <input type="file" id="ward_img" name="ward_img" placeholder="Upload the scheme document" required />
+              </div>
+            </div>
+            <div className="goveSc-form-group">
+              <label htmlFor="wardDetails">Scheme description</label>
+              <div className="goveSc-wardDetails">
+                <textarea id="wardDetails" name="ward_details" placeholder="Enter Scheme description" rows="3" required></textarea>
+              </div>
+            </div>
+
+            {/* New Inputs Section */}
+            <div className="goveSc-form-row">
+              <div className="goveSc-form-group">
                 <label htmlFor="state">Select State</label>
                 <select id="state" name="state" required>
                   <option value="">Select State</option>
@@ -26,7 +44,7 @@ export default function govermentSc() {
                   <option value="chhattisgarh">Chhattisgarh</option>
                 </select>
               </div>
-              <div className="userGoveSc-form-group">
+              <div className="goveSc-form-group">
                 <label htmlFor="age">Select Age</label>
                 <select id="age" name="age" required>
                   <option value="">Select Age Group</option>
@@ -35,14 +53,14 @@ export default function govermentSc() {
                   <option value="18-25">18-25</option>
                 </select>
               </div>
-              <div className="userGoveSc-form-group">
+              <div className="goveSc-form-group">
                 <label htmlFor="income">Income Group</label>
                 <select id="income" name="income" required>
                   <option value="">Select Income Group</option>
                   <option value="0-117000">0 - 1,17,000</option>
                 </select>
               </div>
-              <div className="userGoveSc-form-group">
+              <div className="goveSc-form-group">
                 <label htmlFor="gender">Gender</label>
                 <select id="gender" name="gender" required>
                   <option value="">Select Gender</option>
@@ -52,8 +70,8 @@ export default function govermentSc() {
               </div>
             </div>
 
-            <div className="userGoveSc-form-row">
-              <div className="userGoveSc-form-group">
+            <div className="goveSc-form-row">
+              <div className="goveSc-form-group">
                 <label htmlFor="familySize">Family Size</label>
                 <select id="familySize" name="familySize" required>
                   <option value="">Select Family Size</option>
@@ -62,7 +80,7 @@ export default function govermentSc() {
                   ))}
                 </select>
               </div>
-              <div className="userGoveSc-form-group">
+              <div className="goveSc-form-group">
                 <label htmlFor="maritalStatus">Marital Status</label>
                 <select id="maritalStatus" name="maritalStatus" required>
                   <option value="">Select Marital Status</option>
@@ -71,7 +89,7 @@ export default function govermentSc() {
                   <option value="widow">Widow</option>
                 </select>
               </div>
-              <div className="userGoveSc-form-group">
+              <div className="goveSc-form-group">
                 <label htmlFor="healthProblems">Health Problems</label>
                 <select id="healthProblems" name="healthProblems" required>
                   <option value="">Select Health Problem</option>
@@ -86,7 +104,7 @@ export default function govermentSc() {
               </div>
             </div>
 
-            <div className="userGoveSc-form-group">
+            <div className="goveSc-form-group">
               <label htmlFor="case">Case</label>
               <select id="case" name="case" required>
                 <option value="">Select Case</option>
@@ -96,30 +114,32 @@ export default function govermentSc() {
             </div>
 
             {/* Submit Buttons */}
-            <button className="userGoveSc-register-btn" type="submit" id="submitButton">Submit</button>
+            <button className="goveSc-register-btn" type="submit" id="submitButton">To all users</button>
+            <button className="goveSc-register-btn" type="submit" id="submitButton">To all hospitals</button>
           </form>
         </div>
       </div>
 
       {/* Existing Section */}
       <section>
-        <b className="userGoveSc-titles">Select Hospitals</b>
-        <div className="userGoveSc-lowerSection">
-          <div className="userGoveSc-search">
+        <b className="goveSc-titles">Select Hospitals</b>
+        <div className="goveSc-lowerSection">
+          <div className="goveSc-search">
             <img src={SearchIcon} alt="Search Icon" />
-            <div className="userGoveSc-search-bar">
+            <div className="goveSc-search-bar">
               <input type="text" placeholder="Search By Hospital's Name" />
             </div>
           </div>
-          <div className="userGoveSc-schemes-list">
+          <div className="goveSc-hospital-list">
             {/* Hospital Cards */}
-            <div className="userGoveSc-schemes-card">
-              <div className="userGoveSc-schemes-info">
-                <h3>Scheme 1</h3>
-                <p>Scheme descriptions</p>
-                <div className="userGoveSc-btns">
+            <div className="goveSc-hospital-card">
+              <img src={RajaImage} alt="Rajawadi Hospital" />
+              <div className="goveSc-hospital-info">
+                <h3>Rajawadi Hospital</h3>
+                <p>3, 7th Rd, Rajawadi Colony, Ghatkopar East, Mumbai, Maharashtra 400077</p>
+                <div className="goveSc-btns">
                   <Link to="/user/bedCat">
-                    <button className="userGoveSc-btn">Read More</button>
+                    <button className="goveSc-btn">Select Hospital</button>
                   </Link>
                 </div>
               </div>

@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import L from 'leaflet';
-import '../css/hospitalsMap.css';
+import '../css/goveMap.css';
 import logo from "../img/nav_logo.png"
+import Navbar from '../goverComponents/goveNav';
 
 const HospitalsMap = () => {
   const [hospitals, setHospitals] = useState([]);
@@ -136,7 +137,6 @@ const HospitalsMap = () => {
       <div className="hospMap-map-section">
         <div ref={mapRef} id="map" style={{height: '100%', width: '100%'}}></div>
       </div>
-
       <div className="hospMap-info-section">
         <div className="hospMap-logo">
         <img src={logo} alt="Simple Svastha" />
