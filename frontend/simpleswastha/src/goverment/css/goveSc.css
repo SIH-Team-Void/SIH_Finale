@@ -1,0 +1,232 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+* {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.goveSc-body {
+    font-family: "Poppins", sans-serif;
+    background-color: rgba(219, 232, 210, 1); 
+    min-height: 100vh; 
+    overflow: hidden;
+}
+
+.goveSc-form-container {
+    width: 100%;
+}
+
+.goveSc-forminputs {
+    background-color:  rgba(219, 232, 210, 1);
+    border-radius: 15px;
+    width: 100%;
+}
+
+.goveSc-form-group {
+    margin-bottom: 20px;
+    width: 40%;
+    margin-left: 2%; 
+}
+
+.goveSc-form-row {
+    display: flex;
+    justify-content: start;
+    gap: 7%;
+}
+
+.goveSc-form-group input, .goveSc-form-group textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background-color: rgba(255, 255, 255, 1);
+    font-size: 16px;
+    color: #333;
+    box-sizing: border-box;
+    border-style: none;
+}
+
+.goveSc-form-group label {
+    font-size: 15px;
+    font-weight: bold;
+    color: rgba(94, 209, 140, 1);
+    display: block;
+    margin-bottom: 5px;
+}
+
+.goveSc-register-btn {
+    width: 20%;
+    padding: 10px;
+    background-color: rgba(81, 173, 100, 1);
+    color: rgba(255, 255, 255, 1);
+    border: none;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 3%;
+    margin-left: 3%;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.goveSc-register-btn:hover {
+    transform: scale(1.05);
+}
+
+.goveSc-activity {
+    background-color: rgba(138, 183, 217, 0.7);
+    border-style: none;
+    color: rgba(4, 62, 95, 1);
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    text-decoration: none; 
+    display: inline-block;
+    padding: 10px 15px;
+    margin: 3px;
+}
+
+.goveSc-options {
+    background-color: rgba(94, 160, 209, 0.7);
+    padding: 5px;
+}
+
+.goveSc-title {
+    color:rgba(4, 95, 42, 1);
+    margin-top: 1%;
+    margin-bottom: 1%;
+    margin-left: 2%;
+}
+
+.goveSc-wardDetails {
+    width: 225%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background-color: rgba(255, 255, 255, 1);
+    font-size: 16px;
+    color: #333;
+    box-sizing: border-box;
+    border-style: none;
+}
+
+
+.bedBook-body{
+    background-color: #EEEEE7;
+    font-family: "Poppins", sans-serif;
+}
+
+.bedBook-search-bar input[type="text"] {
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    margin-left: 10px;
+    width: 98%;
+}
+
+.bedBook-search-bar input[type="text"] {
+    flex-grow: 1;
+}
+
+.bedBook-lowerSection {
+    background-color: rgba(187, 214, 194, 1);
+    padding: 20px;
+    border-radius: 15px;
+    margin: 20px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.bedBook-hospital-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.bedBook-hospital-card {
+    display: flex;
+    background-color: #fff;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    margin-top: 3%;
+}
+
+.bedBook-hospital-card img {
+    width: 200px;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 10px;
+    margin: 15px;
+}
+
+.bedBook-hospital-info {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+}
+
+.bedBook-hospital-info h3 {
+    font-size: 18px;
+    color: #333;
+    margin: 0;
+    font-weight: bold;
+}
+
+.bedBook-hospital-info p {
+    font-size: 14px;
+    color: #666;
+    margin: 10px 0;
+}
+
+.bedBook-hospital-info .bedBook-btn {
+    padding: 10px 50px;
+    background-color:rgba(216, 224, 185, 1);
+    border: none;
+    border-radius: 30px;
+    color: rgba(0, 0, 0, 1);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    align-self: flex-start;
+    margin-top: 10px;
+    margin-left: 450%;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    white-space: nowrap;
+}
+
+.bedBook-titles {
+    margin-left: 2.5%;
+}
+
+body section {
+    margin-top: 1.5%;
+}
+
+.bedBook-btns {
+    display: flex;
+    flex-direction: row;
+}
+
+.bedBook-search {
+    display: flex;
+    flex-direction: row;
+    background-color: rgba(255, 255, 255, 1);
+    padding: 10px;
+    border-radius: 20px 20px 20px 20px;
+}
+
+.bedBook-search img {
+    width: 2.5%;
+}
+
+.bedBook-search input {
+    width: 100%;
+}
+
+.bedBook-search-bar {
+    width: 100%;
+}

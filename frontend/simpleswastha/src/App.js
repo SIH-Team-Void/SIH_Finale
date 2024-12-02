@@ -19,7 +19,9 @@ import UserOPDDr from './user/temp/opdDr';
 import UserOPDDrSc from './user/temp/opdDrSc';
 import UserAccount from './user/temp/userAccount';
 import UserGoverSc from './user/temp/govermentSc';
-import GovernmentMap from './goverment/temp/hospitalsMap';
+import GovernmentHome from './goverment/temp/goveHome';
+import GovernmentMap from './goverment/temp/goveMap';
+import GovernmentSc from './goverment/temp/goveSc';
 
 function App() {
   return (
@@ -52,8 +54,9 @@ function App() {
           <Route path="/user/govermentSc" element={<UserGoverSc />} />
 
           {/* Government Portal */}
-          {/* <Route path="/government" element={<GovernmentHome />} /> */}
-          <Route path="/government" element={<GovernmentMap />} />
+          <Route path="/government" element={<GovernmentHome />} />
+          <Route path="/government/map" element={<GovernmentMap />} />
+          <Route path="/government/schemes" element={<GovernmentSc />} />
 
           {/* Catch-All Route */}
           <Route path="*" element={<div>404 - Page Not Found</div>} />
