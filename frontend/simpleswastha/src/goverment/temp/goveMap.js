@@ -12,25 +12,53 @@ const HospitalsMap = () => {
   const mapInstanceRef = useRef(null);
 
   useEffect(() => {
-
     if (mapRef.current && !mapInstanceRef.current) {
-      const mapInstance = L.map(mapRef.current).setView([20.5937, 78.9629], 5);  // Center the map on India
-      
+      const mapInstance = L.map(mapRef.current).setView([20.5937, 78.9629], 5); // Center the map on India
+
       L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
       }).addTo(mapInstance);
-      
+
       mapInstanceRef.current = mapInstance;
     }
 
     const hospitalsData = [
-      { 
-        name: 'City Hospital', lat: 19.0760, lng: 72.8777, contact: '123-456-7890', address: 'Mumbai, Maharashtra' 
+      {
+        name: 'City Hospital',
+        lat: 19.0760,
+        lng: 72.8777,
+        contact: '123-456-7890',
+        address: 'Mumbai, Maharashtra',
       },
-      { 
-        name: 'Global Care Hospital', lat: 28.7041, lng: 77.1025, contact: '098-765-4321', address: 'Delhi, India' 
-      }
+      {
+        name: 'Global Care Hospital',
+        lat: 28.7041,
+        lng: 77.1025,
+        contact: '098-765-4321',
+        address: 'Delhi, India',
+      },
+      {
+        name: 'Sunrise Medical Center',
+        lat: 13.0827,
+        lng: 80.2707,
+        contact: '789-123-4560',
+        address: 'Chennai, Tamil Nadu',
+      },
+      {
+        name: 'Greenfield Hospital',
+        lat: 22.5726,
+        lng: 88.3639,
+        contact: '456-789-0123',
+        address: 'Kolkata, West Bengal',
+      },
+      {
+        name: 'Healing Touch Hospital',
+        lat: 12.9716,
+        lng: 77.5946,
+        contact: '321-654-9870',
+        address: 'Bengaluru, Karnataka',
+      },
     ];
     setHospitals(hospitalsData);
 
@@ -135,11 +163,11 @@ const HospitalsMap = () => {
   return (
     <div className="hospMap-container">
       <div className="hospMap-map-section">
-        <div ref={mapRef} id="map" style={{height: '100%', width: '100%'}}></div>
+        <div ref={mapRef} id="map" style={{ height: '100%', width: '100%' }}></div>
       </div>
       <div className="hospMap-info-section">
         <div className="hospMap-logo">
-        <img src={logo} alt="Simple Svastha" />
+          <img src={logo} alt="Simple Svastha" />
         </div>
 
         <div className="hospMap-search-form">
