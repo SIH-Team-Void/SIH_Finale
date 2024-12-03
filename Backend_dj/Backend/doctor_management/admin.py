@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Doctor, Slot
+from .models import Doctor, Slot, OPDBooking
 
 @admin.register(Doctor)
 class DoctorAdmin(admin.ModelAdmin):
@@ -13,3 +13,9 @@ class SlotAdmin(admin.ModelAdmin):
     search_fields = ('doctor_id__doctor_name', 'day')
     list_filter = ('day', 'hospital_id', 'doctor_id')
 
+class OPDBookingAdmin(admin.ModelAdmin):
+    list_display = [field.name for field in OPDBooking._meta.fields]  
+    search_fields = ['patient_name', 'doctor_id', 'hospital_id']
+    list_filter = ['date', 'doctor_id', 'hospital_id', 'is_booked'] 
+    
+admin.site.register(OPDBooking, OPDBookingAdmin)
