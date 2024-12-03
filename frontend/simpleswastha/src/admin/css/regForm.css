@@ -10,8 +10,8 @@
 }
 
 .reg-title , .reg-sub-titles span{
-    color: rgba(36, 147, 210, 1);
-    font-weight: 600;
+    color: rgba(4, 62, 95, 1);
+    font-weight: bolder;
     margin-left: 2%;
 }
 
@@ -28,6 +28,7 @@
     color: rgba(94, 160, 209, 1);
     display: block;
     margin-bottom: 5px;
+    margin-top: 5px;
 }
 
 .reg-form-group input {
@@ -132,5 +133,5 @@
 }
 
 .reg-main-container{
-    padding-top: 2%;
+    padding-top: 1%;
 }

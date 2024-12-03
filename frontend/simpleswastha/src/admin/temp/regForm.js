@@ -58,7 +58,9 @@ export default function RegForm() {
   return (
     <div className="reg-body">
       <div className="reg-main-container">
-        <span className="reg-title">Hospital Registration</span>
+        <div className="reg-sub-titles">
+                 <h3>Hospital Registration</h3>
+             </div>
         <form onSubmit={handleSubmit}>
           {/* Rest of your existing form remains the same, 
               but add onChange={handleChange} to each input 
