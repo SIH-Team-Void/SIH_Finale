@@ -4,37 +4,52 @@ import Navbar from '../component/navbar';
 import axios from 'axios';
 import '../css/opdSc.css';
 
-
 export default function OpdSc() {
   const [date, setDate] = useState('');
   const [doctor, setDoctor] = useState('');
   const [department, setDepartment] = useState('');
   const [slots, setSlots] = useState([]);
   const [filteredSlots, setFilteredSlots] = useState([]);
-
+  const [departments, setDepartments] = useState([]); // New state for departments
 
   // Fetch slots from the API
   useEffect(() => {
     const fetchSlots = async () => {
       try {
         const response = await axios.get('http://localhost:8000/api/bookings/');
-        setSlots(response.data);  // 'doctor_name' will be included in the response
+        setSlots(response.data); // 'doctor_name' will be included in the response
       } catch (error) {
         console.error('Error fetching bookings:', error);
       }
     };
 
-
     fetchSlots();
   }, []);
 
+  // Fetch departments from the API (new useEffect for departments)
+  useEffect(() => {
+    const fetchDepartments = async () => {
+      try {
+        const response = await axios.get('http://localhost:8000/api/doctors/');
+        // Assuming the department data is included in the response
+        const uniqueDepartments = [
+          ...new Set(response.data.map((doctor) => doctor.department)),
+        ];
+        setDepartments(uniqueDepartments);
+      } catch (error) {
+        console.error('Error fetching departments:', error);
+      }
+    };
+
+    fetchDepartments();
+  }, []);
 
   // Update booking status and details
   const updateSlot = async (slotId, updatedData) => {
     try {
       const response = await axios.put(`http://localhost:8000/api/bookings/${slotId}/`, {
         ...updatedData,
-        is_booked: true,  // Mark the slot as booked
+        is_booked: true, // Mark the slot as booked
       });
       const updatedSlots = slots.map((slot) =>
         slot.booking_id === slotId ? response.data : slot
@@ -44,7 +59,6 @@ export default function OpdSc() {
       console.error('Error updating booking:', error);
     }
   };
-
 
   // Delete booking
   const deleteSlot = async (slotId) => {
@@ -57,7 +71,6 @@ export default function OpdSc() {
     }
   };
 
-
   // Handle filter changes for date, doctor, and department
   const handleFilterChange = () => {
     const filtered = slots.filter((slot) => {
@@ -67,15 +80,14 @@ export default function OpdSc() {
         (department ? slot.department.toLowerCase().includes(department.toLowerCase()) : true)
       );
     });
+
     setFilteredSlots(filtered);
   };
-
 
   // Run filtering whenever slots, date, doctor, or department change
   useEffect(() => {
     handleFilterChange();
   }, [date, doctor, department, slots]);
-
 
   return (
     <div className="opdSc-body">
@@ -105,10 +117,7 @@ export default function OpdSc() {
                 {date && <p>Selected Date: {date}</p>}
               </div>
 
-
               <div className="opdSc-form-group">
-
-
                 <label htmlFor="dr">Select Doctor</label>
                 <select
                   id="dr"
@@ -125,7 +134,6 @@ export default function OpdSc() {
                 {doctor && <p>Selected Doctor: {doctor}</p>}
               </div>
 
-
               <div className="opdSc-form-group">
                 <label htmlFor="Department">Department</label>
                 <select
@@ -134,7 +142,7 @@ export default function OpdSc() {
                   onChange={(e) => setDepartment(e.target.value)}
                 >
                   <option value="">All Departments</option>
-                  {[...new Set(slots.map((slot) => slot.department))].map((departmentOption) => (
+                  {departments.map((departmentOption) => (
                     <option key={departmentOption} value={departmentOption}>
                       {departmentOption}
                     </option>
@@ -144,11 +152,9 @@ export default function OpdSc() {
               </div>
             </div>
 
-
             <div className="opdSc-form-group">
               <label htmlFor="doctor-time">Doctor’s Time slots</label>
             </div>
-
 
             <table>
               <thead>
@@ -199,8 +205,3 @@ export default function OpdSc() {
     </div>
   );
 }
-
-
-
-
-
