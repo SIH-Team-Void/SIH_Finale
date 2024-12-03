@@ -76,13 +76,25 @@
     margin-left: 2%;
 }
 table {
+    display: block;
     width: 80%;
     margin: 20px auto;
     border-collapse: collapse;
     background-color: white;
     border-radius: 10px;
-    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-width: fit-content;
+    max-height: 600px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+table thead {
+    display: table-header-group;
+    position: sticky;
+    top: 0;
+    background-color: #01334d;
+    z-index: 2; /* Ensures that the header is above the table body */
 }
 
 th, td {
@@ -99,6 +111,7 @@ th {
 td {
     background-color: #f7fbff;
 }
+
 
 .opdSc-vacant {
     color: green;

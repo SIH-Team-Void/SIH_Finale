@@ -74,7 +74,6 @@ def create_slots_for_week(sender, instance, created, **kwargs):
     if created:
         instance.generate_slots_for_week()
 
-
 class OPDBooking(models.Model):
     booking_id = models.AutoField(primary_key=True)
     start_time = models.TimeField()
