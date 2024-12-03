@@ -7,15 +7,13 @@ import '../css/drSc.css';
 export default function DrSchedule() {
   const navigate = useNavigate();
   const [hospitalId, setHospitalId] = useState(34); //dummy number
+  const [modalMessage, setModalMessage] = useState('');
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
-    // Fetch the hospital ID from the session or local storage
     const storedHospitalId = localStorage.getItem('hospitalId');
     if (storedHospitalId) {
       setHospitalId(storedHospitalId);
-    } else {
-      // Redirect the user to the login/registration page if the hospital ID is not available
-      //navigate('/admin');
     }
   }, [navigate]);
 
@@ -29,12 +27,13 @@ export default function DrSchedule() {
       education: e.target.elements.education.value,
       department: e.target.elements.department.value,
       hospital_id: hospitalId,
-      fees: e.target.elements.drFee.value
+      fees: e.target.elements.drFee.value,
     };
 
     try {
       const response = await axios.post('http://localhost:8000/api/doctors/', doctorData);
-      console.log('Doctor added:', response.data);
+      setModalMessage(`Doctor "${response.data.doctor_name}" has been added successfully!`);
+      setShowModal(true);
     } catch (error) {
       console.error('Error adding doctor:', error.response ? error.response.data : error.message);
       alert('Error adding doctor. Please try again later.');
@@ -43,10 +42,8 @@ export default function DrSchedule() {
 
   const handleAddOPD = async (e) => {
     e.preventDefault();
-    const formatTime = (timeString) => {
-      return timeString + ':00'; // Ensure seconds are included
-    };
-  
+    const formatTime = (timeString) => timeString + ':00'; // Ensure seconds are included
+
     const slotData = {
       doctor_id: parseInt(e.target.elements.doctorID.value, 10), // Ensure it's a number
       day: e.target.elements.day.value,
@@ -54,21 +51,28 @@ export default function DrSchedule() {
       end_time: formatTime(e.target.elements.endTime.value),
       interval: e.target.elements.interval.value, // Consider validation
       fees: parseFloat(e.target.elements.bookingFee.value), // Ensure it's a number
-      hospital_id: hospitalId
+      hospital_id: hospitalId,
     };
-  
+
     try {
       const response = await axios.post('http://localhost:8000/api/slots/', slotData);
-      console.log('Slot added successfully', response.data);
-      // Optional: Reset form or show success message
+      setModalMessage(
+        `OPD Slot for Doctor ID "${slotData.doctor_id}" on "${slotData.day}" has been added successfully!`
+      );
+      setShowModal(true);
     } catch (error) {
       console.error('Error details:', {
         response: error.response ? error.response.data : 'No response',
         message: error.message,
-        config: error.config
+        config: error.config,
       });
       alert(`Error adding slot: ${error.response ? JSON.stringify(error.response.data) : error.message}`);
     }
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setModalMessage('');
   };
 
   return (
@@ -163,6 +167,15 @@ export default function DrSchedule() {
           <button className="drSc-register-btn" type="submit">ADD SLOT</button>
         </form>
       </div>
+
+      {showModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <p>{modalMessage}</p>
+            <button onClick={closeModal}>Close</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
