@@ -25,7 +25,7 @@ export default function NavbarAdmin() {
         </div>
         <Link to="/admin/home" className="nav-active">Home</Link>
         <Link to="/admin/addBed">Bed Booking</Link>
-        <Link to="/admin/drSc">OPD Appointment</Link>
+        <Link to="/admin/opdSc">OPD Appointment</Link>
         <Link to="/admin/inventory">Inventory</Link>
         <Link to="/admin/account">Account</Link>
         <button className="nav-helpButton" onClick={toggleNotifications}> <img src={bellIcon} alt="Bell Icon" />

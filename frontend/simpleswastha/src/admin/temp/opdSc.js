@@ -57,8 +57,8 @@ export default function OpdSc() {
       <Navbar />
       <div className="opdSc-opdSc-form-container">
         <div className="opdSc-options">
-          <Link to="/admin/drSc" className="opdSc-activity">Manage Existing Schedule</Link>
-          <Link to="/admin/opdSc" className="opdSc-activity">Create New Doctor Schedule</Link>
+        <Link to="/admin/opdSc" className="drSc-activity">Manage Existing Schedule</Link>
+        <Link to="/admin/drSc" className="drSc-activity">Create New Doctor Schedule</Link>
         </div>
         <div className="opdSc-forminputs" id="formContent">
           <form>

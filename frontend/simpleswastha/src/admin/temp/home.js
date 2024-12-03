@@ -39,7 +39,7 @@ export default function Home() {
         </div>
         </Link>
 
-        <Link to="/admin/addBed">
+        <Link to="/admin/opdSc">
           <div className="home-option-box" style={{ backgroundColor: '#b5ebba' }}>
             <div className="home-icon-option" style={{ backgroundColor: '#d9fee1' }}>
               <img src={calendarImage} alt="Calendar" />
