@@ -4,4 +4,5 @@ from .views import GovernmentSchemeListCreateAPIView, GovernmentSchemeDetailAPIV
 urlpatterns = [
     path('schemes/', GovernmentSchemeListCreateAPIView.as_view(), name='scheme-list-create'),
     path('schemes/<int:pk>/', GovernmentSchemeDetailAPIView.as_view(), name='scheme-detail'),
+    
 ]
