@@ -1,15 +1,56 @@
 import React, { useState } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import "../css/userLogin.css";
-import { Link } from 'react-router-dom';
 import logoImage from '../img/icon2.png';
 import chatbotImage from '../img/chatbot_img.png';
 
 export default function UserLogin() {
+  const navigate = useNavigate();
   const [showChatbot, setShowChatbot] = useState(false);
   const [messages, setMessages] = useState([]);
   const [userInput, setUserInput] = useState("");
+  const [formData, setFormData] = useState({
+    username: '',
+    password: '',
+    email: '',
+    phone_no: '',
+    gender: null,
+    blood_group: null,
+    date_of_birth: null,
+    role: 'patient'
+  });
 
   const handleChatbotToggle = () => setShowChatbot(!showChatbot);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prevState => ({
+      ...prevState,
+      [name]: value
+    }));
+  };
+
+  const handleUserRegistration = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await axios.post('http://localhost:8000/api/users/register', formData);
+  
+      // Assuming the backend returns a token or user info
+      console.log('User registered:', response.data);
+  
+      // Navigate to the home page after successful registration
+      navigate('/user/Home');
+    } catch (error) {
+      console.error('Registration error:', error.response ? error.response.data : error.message);
+      if (error.response && error.response.data) {
+        alert(`Registration failed: ${error.response.data.message || JSON.stringify(error.response.data)}`);
+      } else {
+        alert('Registration failed. Please try again later.');
+      }
+    }
+  };
 
   const handleUserInput = async () => {
     if (!userInput.trim()) return;
@@ -75,26 +116,72 @@ export default function UserLogin() {
               <button className="userLog-activity active" id="loginTab">Log In</button>
             </div>
             <div className="userLog-forminputs" id="formContent">
-              <form action="../../Back-end/Login.php" method="POST">
+              <form onSubmit={handleUserRegistration}>
                 <div className="userLog-form-group">
-                  <label htmlFor="name">NAME</label>
-                  <input type="text" id="name" name="name" placeholder="Eg. Ashwin" />
+                  <label htmlFor="username">USERNAME</label>
+                  <input 
+                    type="text" 
+                    id="username" 
+                    name="username" 
+                    placeholder="Eg. Ashwin" 
+                    value={formData.username}
+                    onChange={handleInputChange}
+                    required 
+                  />
                 </div>
                 <div className="userLog-form-group">
-                  <label htmlFor="mobile">Mobile No.</label>
-                  <input type="text" id="mobile" name="mobileNo" placeholder="Eg. 123 xxx xxxx" />
+                  <label htmlFor="phone_no">Mobile No.</label>
+                  <input 
+                    type="tel" 
+                    id="phone_no" 
+                    name="phone_no" 
+                    placeholder="Eg. 123 xxx xxxx" 
+                    value={formData.phone_no}
+                    onChange={handleInputChange}
+                    required 
+                  />
                 </div>
                 <div className="userLog-form-group">
                   <label htmlFor="email">Email</label>
-                  <input type="email" id="email" name="email" placeholder="Eg. abc123@gmail.com" />
+                  <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    placeholder="Eg. abc123@gmail.com" 
+                    value={formData.email}
+                    onChange={handleInputChange}
+                  />
                 </div>
                 <div className="userLog-form-group">
                   <label htmlFor="password">Password</label>
-                  <input type="password" id="password" name="pass" placeholder="*** ***** ***" />
+                  <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    placeholder="*** ***** ***" 
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    required 
+                  />
                 </div>
-                <Link to="/user/Home">
-                  <button className="userLog-register-btn" id="submitButton" type="submit">REGISTER</button>
-                </Link>
+                {/* <div className="userLog-form-group">
+                  <label htmlFor="date_of_birth">Date of Birth</label>
+                  <input 
+                    type="date" 
+                    id="date_of_birth" 
+                    name="date_of_birth" 
+                    value={formData.date_of_birth}
+                    onChange={handleInputChange}
+                    required 
+                  />
+                </div> */}
+                <button 
+                  className="userLog-register-btn" 
+                  id="submitButton" 
+                  type="submit"
+                >
+                  REGISTER
+                </button>
               </form>
             </div>
           </div>

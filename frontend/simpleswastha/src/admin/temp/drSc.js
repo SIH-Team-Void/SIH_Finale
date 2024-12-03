@@ -1,10 +1,24 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Navbar from '../component/navbar';
 import '../css/drSc.css';
 
 export default function DrSchedule() {
+  const navigate = useNavigate();
+  const [hospitalId, setHospitalId] = useState(34); //dummy number
+
+  useEffect(() => {
+    // Fetch the hospital ID from the session or local storage
+    const storedHospitalId = localStorage.getItem('hospitalId');
+    if (storedHospitalId) {
+      setHospitalId(storedHospitalId);
+    } else {
+      // Redirect the user to the login/registration page if the hospital ID is not available
+      //navigate('/admin');
+    }
+  }, [navigate]);
+
   const handleAddDoctor = async (e) => {
     e.preventDefault();
 
@@ -14,42 +28,46 @@ export default function DrSchedule() {
       doctor_phone: e.target.elements.drContact.value,
       education: e.target.elements.education.value,
       department: e.target.elements.department.value,
-      hospital_id: e.target.elements.hospitalId.value,
+      hospital_id: hospitalId,
       fees: e.target.elements.drFee.value
     };
 
     try {
-      // Ensure the full URL is correctly specified
       const response = await axios.post('http://localhost:8000/api/doctors/', doctorData);
-      
-      // Handle success (e.g., show a success message)
       console.log('Doctor added:', response.data);
     } catch (error) {
       console.error('Error adding doctor:', error.response ? error.response.data : error.message);
-      // Handle error (e.g., show an error message)
-    }    
+      alert('Error adding doctor. Please try again later.');
+    }
   };
 
   const handleAddOPD = async (e) => {
     e.preventDefault();
-
-    const slotData = {
-      doctor_id: e.target.elements.doctorID.value,
-      day: e.target.elements.day.value,
-      start_time: e.target.elements.startTime.value,
-      end_time: e.target.elements.endTime.value,
-      interval: e.target.elements.interval.value, // Adding interval 
-      fees: e.target.elements.bookingFee.value,
-      hospital_id: e.target.elements.hospitalId.value
+    const formatTime = (timeString) => {
+      return timeString + ':00'; // Ensure seconds are included
     };
-
+  
+    const slotData = {
+      doctor_id: parseInt(e.target.elements.doctorID.value, 10), // Ensure it's a number
+      day: e.target.elements.day.value,
+      start_time: formatTime(e.target.elements.startTime.value),
+      end_time: formatTime(e.target.elements.endTime.value),
+      interval: e.target.elements.interval.value, // Consider validation
+      fees: parseFloat(e.target.elements.bookingFee.value), // Ensure it's a number
+      hospital_id: hospitalId
+    };
+  
     try {
-      await axios.post('http://localhost:8000/api/slots/', slotData);
-      // Handle success (e.g., show a success message)
-      console.log('Slot added successfully');
+      const response = await axios.post('http://localhost:8000/api/slots/', slotData);
+      console.log('Slot added successfully', response.data);
+      // Optional: Reset form or show success message
     } catch (error) {
-      console.error('Error adding slot:', error);
-      // Handle error (e.g., show an error message)
+      console.error('Error details:', {
+        response: error.response ? error.response.data : 'No response',
+        message: error.message,
+        config: error.config
+      });
+      alert(`Error adding slot: ${error.response ? JSON.stringify(error.response.data) : error.message}`);
     }
   };
 
@@ -58,8 +76,8 @@ export default function DrSchedule() {
       <Navbar />
       <div className="drSc-main">
         <div className="drSc-options">
-          <Link to="/admin/DrSc" className="drSc-activity">Manage Existing Schedule</Link>
-          <Link to="/admin/opdSc" className="drSc-activity">Create New Doctor Schedule</Link>
+          <Link to="/admin/opdSc" className="drSc-activity">Manage Existing Schedule</Link>
+          <Link to="/admin/drSc" className="drSc-activity">Create New Doctor Schedule</Link>
         </div>
 
         <form onSubmit={handleAddDoctor}>
@@ -139,13 +157,6 @@ export default function DrSchedule() {
             <div className="drSc-form-group">
               <label htmlFor="bookingFee">Booking Fee</label>
               <input type="number" id="bookingFee" name="bookingFee" placeholder="Booking Fee" required />
-            </div>
-          </div>
-
-          <div className="drSc-form-row">
-            <div className="drSc-form-group">
-              <label htmlFor="hospitalId">Hospital ID</label>
-              <input type="number" id="hospitalId" name="hospitalId" placeholder="Hospital ID" required />
             </div>
           </div>
 
