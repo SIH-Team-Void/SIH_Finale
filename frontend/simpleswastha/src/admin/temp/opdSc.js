@@ -49,7 +49,11 @@ export default function OpdSc() {
     try {
       const response = await axios.put(`http://localhost:8000/api/bookings/${slotId}/`, {
         ...updatedData,
+<<<<<<< HEAD
+        is_booked: true,  
+=======
         is_booked: true, // Mark the slot as booked
+>>>>>>> 4432a3e48e67bba4c4897a3c6ef75357a8e27ca5
       });
       const updatedSlots = slots.map((slot) =>
         slot.booking_id === slotId ? response.data : slot

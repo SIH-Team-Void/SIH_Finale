@@ -23,6 +23,10 @@ export default function UserLogin() {
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
 
+  const chatbotRef = useRef(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+
   const handleChatbotToggle = () => setShowChatbot(!showChatbot);
 
   const handleInputChange = (e) => {
@@ -47,6 +51,15 @@ export default function UserLogin() {
     console.log("Form Data:", loginData);  // Debugging: Log the data being sent
 
     try {
+<<<<<<< HEAD
+      const response = await axios.post('http://localhost:8000/api/users/register', formData);
+      console.log('User registered:', response.data);
+      navigate('/user/Home');
+    } catch (error) {
+      console.error('Registration error:', error.response ? error.response.data : error.message);
+      if (error.response && error.response.data) {
+        alert(`Registration failed: ${error.response.data.message || JSON.stringify(error.response.data)}`);
+=======
       console.log(`Sending request to: ${endpoint}`);  // Debugging: Log the endpoint being hit
       const response = await axios.post(endpoint, loginData);
       console.log("Response Data:", response.data);  
@@ -60,11 +73,37 @@ export default function UserLogin() {
         localStorage.setItem('userData', JSON.stringify(userData));
         console.log(localStorage);
         navigate('/user/Home');
+>>>>>>> 4432a3e48e67bba4c4897a3c6ef75357a8e27ca5
       } else {
         // Handle registration success
         alert('Registration successful! Please log in.');
         setIsLogin(true); // Switch to login view
       }
+<<<<<<< HEAD
+    }
+  };
+
+  const handleUserInput = async () => {
+    if (!userInput.trim()) return;
+
+    const userMessage = { role: "user", content: userInput };
+    setMessages([...messages, userMessage]);
+
+    try {
+      const response = await axios.post('http://localhost:8000/chat', { content: userInput });
+      const botMessage = {
+        role: "bot",
+        content: response.data.response || "Sorry, I couldn't understand that. Can you rephrase?"
+      };
+      setMessages((prev) => [...prev, botMessage]);
+    } catch (error) {
+      console.error('Error fetching chatbot response:', error);
+      const errorMessage = {
+        role: "bot",
+        content: "Sorry, there was an issue connecting to the chatbot. Please try again later."
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+=======
     } catch (error) {
       // Debugging: Log the error details
       console.error(`${isLogin ? 'Login' : 'Registration'} error:`, error.response?.data || error.message);
@@ -74,7 +113,34 @@ export default function UserLogin() {
       }
       
       alert(`${isLogin ? 'Login' : 'Registration'} failed. Please try again.`);
+>>>>>>> 4432a3e48e67bba4c4897a3c6ef75357a8e27ca5
     }
+
+    setUserInput("");
+  };
+
+  // Dragging logic for the chatbot modal
+  const handleDragStart = (e) => {
+    setIsDragging(true);
+    const rect = chatbotRef.current.getBoundingClientRect();
+    setDragOffset({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    });
+
+    // Preserve size during dragging
+    chatbotRef.current.style.width = `${rect.width}px`;
+    chatbotRef.current.style.height = `${rect.height}px`;
+  };
+
+  const handleDrag = (e) => {
+    if (!isDragging) return;
+    chatbotRef.current.style.left = `${e.clientX - dragOffset.x}px`;
+    chatbotRef.current.style.top = `${e.clientY - dragOffset.y}px`;
+  };
+
+  const handleDragEnd = () => {
+    setIsDragging(false);
   };
 
   const handleUserInput = async () => {
@@ -145,6 +211,15 @@ export default function UserLogin() {
           </button>
         </div>
         <div className="userLog-right-container">
+<<<<<<< HEAD
+          <p className="login-line1">
+            <b>Start with Your Registration</b>
+          </p>
+          <Link to="/user/signup">
+            <button className="userLog-RegBut">Create Account</button>
+          </Link>
+          <p>For Existing User</p>
+=======
           <div className="userLog-options">
             <button
               className={`userLog-activity ${isLogin ? 'active' : ''}`}
@@ -159,6 +234,7 @@ export default function UserLogin() {
               Register
             </button>
           </div>
+>>>>>>> 4432a3e48e67bba4c4897a3c6ef75357a8e27ca5
           <div className="userLog-form-container">
             <form onSubmit={handleFormSubmit}>
               {!isLogin && (
@@ -199,6 +275,66 @@ export default function UserLogin() {
                     onChange={handleInputChange}
                   />
                 </div>
+<<<<<<< HEAD
+                <div className="userLog-form-group">
+                  <label htmlFor="password">Password</label>
+                  <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    placeholder="*** ***** ***" 
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    required 
+                  />
+                </div>
+                <button 
+                  className="userLog-register-btn" 
+                  id="submitButton" 
+                  type="submit"
+                >
+                  REGISTER
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {showChatbot && (
+        <div
+          className="chatbot-modal"
+          ref={chatbotRef}
+          onMouseDown={handleDragStart}
+          onMouseMove={handleDrag}
+          onMouseUp={handleDragEnd}
+          onMouseLeave={handleDragEnd}
+          style={{ position: "absolute", top: "10%", left: "10%" , height: "62%" }}
+        >
+          <div className="chatbot-header">
+            <h3>Simple Swastha AI Chatbot</h3>
+            <button onClick={handleChatbotToggle} className='botClose'>X</button>
+          </div>
+          <div className="chatbot-messages">
+            {messages.map((msg, index) => (
+              <div key={index} className={msg.role === "user" ? "user-message" : "bot-message"}>
+                {msg.content}
+              </div>
+            ))}
+          </div>
+          <div className="chatbot-input">
+            <input
+              type="text"
+              value={userInput}
+              onChange={(e) => setUserInput(e.target.value)}
+              placeholder="Type your symptoms here..."  
+              className='botInput'
+            />
+            <button onClick={handleUserInput} className='botSent'>Send</button>
+          </div>
+        </div>
+      )}
+=======
               )}
               <div className="userLog-form-group">
                 <label htmlFor="password">Password</label>
@@ -219,6 +355,7 @@ export default function UserLogin() {
           </div>
         </div>
       </div>
+>>>>>>> 4432a3e48e67bba4c4897a3c6ef75357a8e27ca5
       {showChatbot && (
         <div
           className="chatbot-modal"
