@@ -15,9 +15,10 @@ export default function AddBed() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    const hosp_ID = localStorage.getItem('hosp_ID');
 
     try {
-      const response = await fetch('http://127.0.0.1:8000/bed_management/ward/add/', {
+      const response = await fetch(`http://127.0.0.1:8000/bed_management/ward/add/${hosp_ID}/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -27,9 +28,15 @@ export default function AddBed() {
           no_of_beds: noOfBeds,
           cost: Cost,
           ward_img: wardImg,
-          ward_details: wardDetails
+          ward_details: wardDetails,
+          hospital: hosp_ID
         })
       });
+      if (!response.ok) {
+        const text = await response.text();
+        console.log('Error response:', text);
+        throw new Error(`HTTP error! status: ${response.status}`);
+    }
 
       const data = await response.json();
 
