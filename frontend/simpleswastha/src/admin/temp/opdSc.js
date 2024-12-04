@@ -9,14 +9,15 @@ export default function OpdSc() {
   const [doctor, setDoctor] = useState('');
   const [department, setDepartment] = useState('');
   const [slots, setSlots] = useState([]);
+  const [filteredSlots, setFilteredSlots] = useState([]);
+  const [departments, setDepartments] = useState([]); // New state for departments
 
   // Fetch slots from the API
   useEffect(() => {
     const fetchSlots = async () => {
       try {
         const response = await axios.get('http://localhost:8000/api/bookings/');
-        console.log(response.data);
-        setSlots(response.data);  // 'doctor_name' will be included in the response
+        setSlots(response.data); // 'doctor_name' will be included in the response
       } catch (error) {
         console.error('Error fetching bookings:', error);
       }
@@ -25,12 +26,30 @@ export default function OpdSc() {
     fetchSlots();
   }, []);
 
+  // Fetch departments from the API (new useEffect for departments)
+  useEffect(() => {
+    const fetchDepartments = async () => {
+      try {
+        const response = await axios.get('http://localhost:8000/api/doctors/');
+        // Assuming the department data is included in the response
+        const uniqueDepartments = [
+          ...new Set(response.data.map((doctor) => doctor.department)),
+        ];
+        setDepartments(uniqueDepartments);
+      } catch (error) {
+        console.error('Error fetching departments:', error);
+      }
+    };
+
+    fetchDepartments();
+  }, []);
+
   // Update booking status and details
   const updateSlot = async (slotId, updatedData) => {
     try {
       const response = await axios.put(`http://localhost:8000/api/bookings/${slotId}/`, {
         ...updatedData,
-        is_booked: true,  // Mark the slot as booked
+        is_booked: true, // Mark the slot as booked
       });
       const updatedSlots = slots.map((slot) =>
         slot.booking_id === slotId ? response.data : slot
@@ -52,41 +71,84 @@ export default function OpdSc() {
     }
   };
 
+  // Handle filter changes for date, doctor, and department
+  const handleFilterChange = () => {
+    const filtered = slots.filter((slot) => {
+      return (
+        (date ? slot.date === date : true) &&
+        (doctor ? slot.doctor_name.toLowerCase().includes(doctor.toLowerCase()) : true) &&
+        (department ? slot.department.toLowerCase().includes(department.toLowerCase()) : true)
+      );
+    });
+
+    setFilteredSlots(filtered);
+  };
+
+  // Run filtering whenever slots, date, doctor, or department change
+  useEffect(() => {
+    handleFilterChange();
+  }, [date, doctor, department, slots]);
+
   return (
     <div className="opdSc-body">
       <Navbar />
       <div className="opdSc-opdSc-form-container">
         <div className="opdSc-options">
-        <Link to="/admin/opdSc" className="drSc-activity">Manage Existing Schedule</Link>
-        <Link to="/admin/drSc" className="drSc-activity">Create New Doctor Schedule</Link>
+          <Link to="/admin/opdSc" className="drSc-activity">Manage Existing Schedule</Link>
+          <Link to="/admin/drSc" className="drSc-activity">Create New Doctor Schedule</Link>
         </div>
         <div className="opdSc-forminputs" id="formContent">
           <form>
             <div className="opdSc-form-row">
               <div className="opdSc-form-group">
                 <label htmlFor="date">Select Date</label>
-                <input type="date" id="date" value={date} onChange={(e) => setDate(e.target.value)} />
+                <select
+                  id="date"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                >
+                  <option value="">All Dates</option>
+                  {[...new Set(slots.map((slot) => slot.date))].map((dateOption) => (
+                    <option key={dateOption} value={dateOption}>
+                      {dateOption}
+                    </option>
+                  ))}
+                </select>
+                {date && <p>Selected Date: {date}</p>}
               </div>
+
               <div className="opdSc-form-group">
                 <label htmlFor="dr">Select Doctor</label>
-                <input
-                  type="text"
+                <select
                   id="dr"
-                  placeholder="Select Doctor"
                   value={doctor}
                   onChange={(e) => setDoctor(e.target.value)}
-                  required
-                />
+                >
+                  <option value="">All Doctors</option>
+                  {[...new Set(slots.map((slot) => slot.doctor_name))].map((doctorOption) => (
+                    <option key={doctorOption} value={doctorOption}>
+                      {doctorOption}
+                    </option>
+                  ))}
+                </select>
+                {doctor && <p>Selected Doctor: {doctor}</p>}
               </div>
+
               <div className="opdSc-form-group">
                 <label htmlFor="Department">Department</label>
-                <input
-                  type="text"
+                <select
                   id="Department"
-                  placeholder="Department"
                   value={department}
                   onChange={(e) => setDepartment(e.target.value)}
-                />
+                >
+                  <option value="">All Departments</option>
+                  {departments.map((departmentOption) => (
+                    <option key={departmentOption} value={departmentOption}>
+                      {departmentOption}
+                    </option>
+                  ))}
+                </select>
+                {department && <p>Selected Department: {department}</p>}
               </div>
             </div>
 
@@ -107,7 +169,7 @@ export default function OpdSc() {
                 </tr>
               </thead>
               <tbody>
-                {slots.map((slot) => (
+                {filteredSlots.map((slot) => (
                   <tr key={slot.booking_id}>
                     <td>{slot.doctor_name}</td>
                     <td>{slot.date}</td>
@@ -137,7 +199,6 @@ export default function OpdSc() {
                 ))}
               </tbody>
             </table>
-            <button type="submit" className="opdSc-submit-btn">Save Schedule</button>
           </form>
         </div>
       </div>

@@ -43,7 +43,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=150, unique=True)
     password = models.CharField(max_length=128)
     email = models.EmailField(blank=True, null=True)
-    phone_no = models.CharField(max_length=15)
+    phone_no = models.CharField(max_length=15, unique=True)
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, blank=True, null=True)
     blood_group = models.CharField(max_length=3, choices=BLOOD_GROUP_CHOICES, blank=True, null=True)
     date_of_birth = models.DateField(blank=True, null=True)
@@ -55,8 +55,8 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     objects = UserManager()
 
-    USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['phone_no']
+    USERNAME_FIELD = 'phone_no'
+    REQUIRED_FIELDS = ['email']
 
     def __str__(self):
         return self.username
