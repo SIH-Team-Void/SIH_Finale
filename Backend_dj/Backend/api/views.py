@@ -31,7 +31,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
 from django.contrib.auth.hashers import make_password, check_password
-
+import time
 from .models import Hospital
 from .serializers import HospitalRegistrationSerializer
 
@@ -67,40 +67,23 @@ class HospitalRegistrationView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class HospitalLoginView(APIView):
-    permission_classes = [AllowAny]
-    
-    def post(self, request):
-        # Print out the received data for debugging
-        print("Received login data:", request.data)
+   permission_classes = [AllowAny]
+
+   def post(self, request):
+       hosp_ID = request.data.get('hosp_ID')
+       hosp_email = request.data.get('hosp_email')
+       if not hosp_ID or not hosp_email:
+           return Response({'error': 'Hospital ID and Email are required'}, status=status.HTTP_400_BAD_REQUEST)
+       try:
+           hospital = Hospital.objects.get(hosp_ID=hosp_ID, hosp_email=hosp_email)
+           return Response({
+               'message': 'Login successful',
+               'hospital_name': hospital.hosp_name,
+               'hospital_id': hospital.hosp_ID,
+               'hospital_email': hospital.hosp_email,
+               'hospital_no_of_beds': hospital.hosp_no_of_beds
+           })
+       except Hospital.DoesNotExist:
+           return Response({'error': 'Invalid Hospital ID or Email'}, status=status.HTTP_401_UNAUTHORIZED)
+   
         
-        # Extract login credentials from request
-        hosp_id = request.data.get('hosp_id')
-        hosp_email = request.data.get('hosp_email')
-        password = request.data.get('password')
-        
-        # Validate input
-        if not all([hosp_id, hosp_email, password]):
-            return Response({
-                'error': 'Hospital ID, Email, and Password are required',
-                'received_data': request.data
-            }, status=status.HTTP_400_BAD_REQUEST)
-        
-        try:
-            # Find hospital by ID and email
-            hospital = Hospital.objects.get(hosp_ID=hosp_id, hosp_email=hosp_email)
-        except Hospital.DoesNotExist:
-            return Response({
-                'error': 'Invalid Hospital ID or Email'
-            }, status=status.HTTP_401_UNAUTHORIZED)
-        
-        # Check password
-        if check_password(password, hospital.hosp_password):
-            return Response({
-                'message': 'Login successful',
-                'hospital_name': hospital.hosp_name,
-                'hospital_id': hospital.hosp_ID
-            }, status=status.HTTP_200_OK)
-        else:
-            return Response({
-                'error': 'Invalid password'
-            }, status=status.HTTP_401_UNAUTHORIZED)

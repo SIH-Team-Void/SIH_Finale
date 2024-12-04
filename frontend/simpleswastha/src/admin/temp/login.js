@@ -66,7 +66,7 @@ import chatbotImage from '../img/chatbot_img.png';
 import '../css/login.css';
 
 export default function Login() {
-  const [hosp_Id, setHospId] = useState('');
+  const [hosp_ID, setHospId] = useState('');
   const [hosp_Email, setHospEmail] = useState('');
   const [hosp_password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -83,7 +83,7 @@ export default function Login() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          hosp_id: hosp_Id,
+          hosp_ID: hosp_ID,
           hosp_email: hosp_Email,
           password: hosp_password
         })
@@ -92,6 +92,9 @@ export default function Login() {
       const data = await response.json();
 
       if (response.ok) {
+        localStorage.setItem('hosp_ID', data.hospital_id);
+        console.log('Hospital ID stored successfully:', data.hospital_id);
+        console.log('Retrieved hospital ID:', localStorage.getItem('hosp_ID'));
         // Login successful
         console.log(data.message);
         navigate('/admin/home'); // Redirect to home page
@@ -134,13 +137,13 @@ export default function Login() {
             {error && <div style={{color: 'red', marginBottom: '10px'}}>{error}</div>}
             <div className="login-forminputs" id="formContent">
               <div className="login-form-group">
-                <label htmlFor="hosp_id">Enter your Hospital ID</label>
+                <label htmlFor="hosp_ID">Enter your Hospital ID</label>
                 <input 
                   type="text" 
-                  id="hosp_id" 
-                  name="hosp_id" 
+                  id="hosp_ID" 
+                  name="hosp_ID" 
                   placeholder="Enter UHID" 
-                  value={hosp_Id}
+                  value={hosp_ID}
                   onChange={(e) => setHospId(e.target.value)}
                   required 
                 />
