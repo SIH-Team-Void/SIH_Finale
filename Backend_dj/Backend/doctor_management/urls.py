@@ -5,11 +5,8 @@ from .views import DoctorViewSet, SlotViewSet, OPDBookingViewSet
 router = DefaultRouter()
 router.register(r'doctors', DoctorViewSet)
 router.register(r'slots', SlotViewSet)
-router.register(r'bookings', OPDBookingViewSet)
+router.register(r'bookings', OPDBookingViewSet, basename='booking')
 
 urlpatterns = [
     path('', include(router.urls)),
 ]
-
-
-

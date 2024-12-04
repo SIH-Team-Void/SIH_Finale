@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import "../css/userLogin.css";
@@ -16,12 +16,21 @@ export default function UserLogin() {
     phone_no: '',
     role: 'patient',
   });
+  const [messages, setMessages] = useState([]); // Add state for messages
+  const [userInput, setUserInput] = useState(''); // Add state for user input
+
+  const chatbotRef = useRef(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
 
   const handleChatbotToggle = () => setShowChatbot(!showChatbot);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData(prevState => ({
+      ...prevState,
+      [name]: value
+    }));
   };
 
   const handleFormSubmit = async (e) => {
@@ -40,13 +49,13 @@ export default function UserLogin() {
     try {
       console.log(`Sending request to: ${endpoint}`);  // Debugging: Log the endpoint being hit
       const response = await axios.post(endpoint, loginData);
-      console.log("Response Data:", response.data);  // Debugging: Log the response from the server
+      console.log("Response Data:", response.data);  
 
       console.log(`${isLogin ? 'User logged in' : 'User registered'}:`, response.data);
 
       if (isLogin) {
         const userData = response.data;
-        console.log(userData)
+        console.log(userData);
         
         localStorage.setItem('userData', JSON.stringify(userData));
         console.log(localStorage);
@@ -66,6 +75,54 @@ export default function UserLogin() {
       
       alert(`${isLogin ? 'Login' : 'Registration'} failed. Please try again.`);
     }
+  };
+
+  const handleUserInput = async () => {
+    if (!userInput.trim()) return;
+
+    const userMessage = { role: "user", content: userInput };
+    setMessages([...messages, userMessage]);
+
+    try {
+      const response = await axios.post('http://localhost:8000/chat', { content: userInput });
+      const botMessage = {
+        role: "bot",
+        content: response.data.response || "Sorry, I couldn't understand that. Can you rephrase?"
+      };
+      setMessages((prev) => [...prev, botMessage]);
+    } catch (error) {
+      console.error('Error fetching chatbot response:', error);
+      const errorMessage = {
+        role: "bot",
+        content: "Sorry, there was an issue connecting to the chatbot. Please try again later."
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+    }
+
+    setUserInput("");
+  };
+
+  const handleDragStart = (e) => {
+    setIsDragging(true);
+    const rect = chatbotRef.current.getBoundingClientRect();
+    setDragOffset({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    });
+
+    // Preserve size during dragging
+    chatbotRef.current.style.width = `${rect.width}px`;
+    chatbotRef.current.style.height = `${rect.height}px`;
+  };
+
+  const handleDrag = (e) => {
+    if (!isDragging) return;
+    chatbotRef.current.style.left = `${e.clientX - dragOffset.x}px`;
+    chatbotRef.current.style.top = `${e.clientY - dragOffset.y}px`;
+  };
+
+  const handleDragEnd = () => {
+    setIsDragging(false);
   };
 
   return (
@@ -162,6 +219,38 @@ export default function UserLogin() {
           </div>
         </div>
       </div>
+      {showChatbot && (
+        <div
+          className="chatbot-modal"
+          ref={chatbotRef}
+          onMouseDown={handleDragStart}
+          onMouseMove={handleDrag}
+          onMouseUp={handleDragEnd}
+          onMouseLeave={handleDragEnd}
+          style={{ position: "absolute", top: "10%", left: "10%" }}
+        >
+          <div className="chatbot-header">
+            <h3>Simple Swastha AI Chatbot</h3>
+            <button onClick={handleChatbotToggle} className='botClose'>X</button>
+          </div>
+          <div className="chatbot-messages">
+            {messages.map((msg, index) => (
+              <div key={index} className={msg.role}>
+                <p>{msg.content}</p>
+              </div>
+            ))}
+          </div>
+          <div className="chatbot-input">
+            <input
+              type="text"
+              placeholder="Ask a question..."
+              value={userInput}
+              onChange={(e) => setUserInput(e.target.value)}
+            />
+            <button onClick={handleUserInput}>Send</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
