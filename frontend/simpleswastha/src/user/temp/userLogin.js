@@ -4,22 +4,17 @@ import { useNavigate } from 'react-router-dom';
 import "../css/userLogin.css";
 import logoImage from '../img/icon2.png';
 import chatbotImage from '../img/chatbot_img.png';
-import { Link } from 'react-router-dom';
 
 export default function UserLogin() {
   const navigate = useNavigate();
+  const [isLogin, setIsLogin] = useState(true); // Toggle between login and registration
   const [showChatbot, setShowChatbot] = useState(false);
-  const [messages, setMessages] = useState([]);
-  const [userInput, setUserInput] = useState("");
   const [formData, setFormData] = useState({
     username: '',
     password: '',
     email: '',
     phone_no: '',
-    gender: null,
-    blood_group: null,
-    date_of_birth: null,
-    role: 'patient'
+    role: 'patient',
   });
 
   const chatbotRef = useRef(null);
@@ -30,16 +25,24 @@ export default function UserLogin() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prevState => ({
-      ...prevState,
-      [name]: value
-    }));
+    setFormData({ ...formData, [name]: value });
   };
 
-  const handleUserRegistration = async (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
+    const endpoint = isLogin
+      ? 'http://localhost:8000/api/users/login/'
+      : 'http://localhost:8000/api/users/register/';
+
+    // For login, send phone_no and password
+    const loginData = isLogin
+      ? { phone_no: formData.phone_no, password: formData.password }
+      : formData;
+
+    console.log("Form Data:", loginData);  // Debugging: Log the data being sent
 
     try {
+<<<<<<< HEAD
       const response = await axios.post('http://localhost:8000/api/users/register', formData);
       console.log('User registered:', response.data);
       navigate('/user/Home');
@@ -47,9 +50,27 @@ export default function UserLogin() {
       console.error('Registration error:', error.response ? error.response.data : error.message);
       if (error.response && error.response.data) {
         alert(`Registration failed: ${error.response.data.message || JSON.stringify(error.response.data)}`);
+=======
+      console.log(`Sending request to: ${endpoint}`);  // Debugging: Log the endpoint being hit
+      const response = await axios.post(endpoint, loginData);
+      console.log("Response Data:", response.data);  // Debugging: Log the response from the server
+
+      console.log(`${isLogin ? 'User logged in' : 'User registered'}:`, response.data);
+
+      if (isLogin) {
+        const userData = response.data;
+        console.log(userData)
+        
+        localStorage.setItem('userData', JSON.stringify(userData));
+        console.log(localStorage);
+        navigate('/user/Home');
+>>>>>>> 4432a3e48e67bba4c4897a3c6ef75357a8e27ca5
       } else {
-        alert('Registration failed. Please try again later.');
+        // Handle registration success
+        alert('Registration successful! Please log in.');
+        setIsLogin(true); // Switch to login view
       }
+<<<<<<< HEAD
     }
   };
 
@@ -73,6 +94,17 @@ export default function UserLogin() {
         content: "Sorry, there was an issue connecting to the chatbot. Please try again later."
       };
       setMessages((prev) => [...prev, errorMessage]);
+=======
+    } catch (error) {
+      // Debugging: Log the error details
+      console.error(`${isLogin ? 'Login' : 'Registration'} error:`, error.response?.data || error.message);
+
+      if (error.response) {
+        console.error("Error Response Data:", error.response.data);  // Log full error response
+      }
+      
+      alert(`${isLogin ? 'Login' : 'Registration'} failed. Please try again.`);
+>>>>>>> 4432a3e48e67bba4c4897a3c6ef75357a8e27ca5
     }
 
     setUserInput("");
@@ -122,6 +154,7 @@ export default function UserLogin() {
           </button>
         </div>
         <div className="userLog-right-container">
+<<<<<<< HEAD
           <p className="login-line1">
             <b>Start with Your Registration</b>
           </p>
@@ -129,47 +162,63 @@ export default function UserLogin() {
             <button className="userLog-RegBut">Create Account</button>
           </Link>
           <p>For Existing User</p>
+=======
+          <div className="userLog-options">
+            <button
+              className={`userLog-activity ${isLogin ? 'active' : ''}`}
+              onClick={() => setIsLogin(true)}
+            >
+              Log In
+            </button>
+            <button
+              className={`userLog-activity ${!isLogin ? 'active' : ''}`}
+              onClick={() => setIsLogin(false)}
+            >
+              Register
+            </button>
+          </div>
+>>>>>>> 4432a3e48e67bba4c4897a3c6ef75357a8e27ca5
           <div className="userLog-form-container">
-            <div className="userLog-options">
-              <button className="userLog-activity active" id="loginTab">Log In</button>
-            </div>
-            <div className="userLog-forminputs" id="formContent">
-              <form onSubmit={handleUserRegistration}>
+            <form onSubmit={handleFormSubmit}>
+              {!isLogin && (
                 <div className="userLog-form-group">
                   <label htmlFor="username">USERNAME</label>
-                  <input 
-                    type="text" 
-                    id="username" 
-                    name="username" 
-                    placeholder="Eg. Ashwin" 
+                  <input
+                    type="text"
+                    id="username"
+                    name="username"
+                    placeholder="Eg. Ashwin"
                     value={formData.username}
                     onChange={handleInputChange}
-                    required 
+                    required
                   />
                 </div>
-                <div className="userLog-form-group">
-                  <label htmlFor="phone_no">Mobile No.</label>
-                  <input 
-                    type="tel" 
-                    id="phone_no" 
-                    name="phone_no" 
-                    placeholder="Eg. 123 xxx xxxx" 
-                    value={formData.phone_no}
-                    onChange={handleInputChange}
-                    required 
-                  />
-                </div>
+              )}
+              <div className="userLog-form-group">
+                <label htmlFor="phone_no">Mobile No.</label>
+                <input
+                  type="tel"
+                  id="phone_no"
+                  name="phone_no"
+                  placeholder="Eg. 123 xxx xxxx"
+                  value={formData.phone_no}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+              {!isLogin && (
                 <div className="userLog-form-group">
                   <label htmlFor="email">Email</label>
-                  <input 
-                    type="email" 
-                    id="email" 
-                    name="email" 
-                    placeholder="Eg. abc123@gmail.com" 
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="Eg. abc123@gmail.com"
                     value={formData.email}
                     onChange={handleInputChange}
                   />
                 </div>
+<<<<<<< HEAD
                 <div className="userLog-form-group">
                   <label htmlFor="password">Password</label>
                   <input 
@@ -228,6 +277,28 @@ export default function UserLogin() {
           </div>
         </div>
       )}
+=======
+              )}
+              <div className="userLog-form-group">
+                <label htmlFor="password">Password</label>
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  placeholder="*** ***** ***"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+              <button className="userLog-register-btn" type="submit">
+                {isLogin ? 'LOGIN' : 'REGISTER'}
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+>>>>>>> 4432a3e48e67bba4c4897a3c6ef75357a8e27ca5
     </div>
   );
 }
