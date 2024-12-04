@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import "../css/userLogin.css";
@@ -22,6 +22,10 @@ export default function UserLogin() {
     role: 'patient'
   });
 
+  const chatbotRef = useRef(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+
   const handleChatbotToggle = () => setShowChatbot(!showChatbot);
 
   const handleInputChange = (e) => {
@@ -37,11 +41,7 @@ export default function UserLogin() {
 
     try {
       const response = await axios.post('http://localhost:8000/api/users/register', formData);
-  
-      // Assuming the backend returns a token or user info
       console.log('User registered:', response.data);
-  
-      // Navigate to the home page after successful registration
       navigate('/user/Home');
     } catch (error) {
       console.error('Registration error:', error.response ? error.response.data : error.message);
@@ -60,29 +60,46 @@ export default function UserLogin() {
     setMessages([...messages, userMessage]);
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content: userInput }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Server error: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      const botMessage = { role: "bot", content: data.response };
+      const response = await axios.post('http://localhost:8000/chat', { content: userInput });
+      const botMessage = {
+        role: "bot",
+        content: response.data.response || "Sorry, I couldn't understand that. Can you rephrase?"
+      };
       setMessages((prev) => [...prev, botMessage]);
     } catch (error) {
-      console.error("Error communicating with chatbot:", error);
+      console.error('Error fetching chatbot response:', error);
       const errorMessage = {
         role: "bot",
-        content: "Sorry, I couldn't connect to the server. Please try again later.",
+        content: "Sorry, there was an issue connecting to the chatbot. Please try again later."
       };
       setMessages((prev) => [...prev, errorMessage]);
-    } finally {
-      setUserInput("");
     }
+
+    setUserInput("");
+  };
+
+  // Dragging logic for the chatbot modal
+  const handleDragStart = (e) => {
+    setIsDragging(true);
+    const rect = chatbotRef.current.getBoundingClientRect();
+    setDragOffset({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    });
+
+    // Preserve size during dragging
+    chatbotRef.current.style.width = `${rect.width}px`;
+    chatbotRef.current.style.height = `${rect.height}px`;
+  };
+
+  const handleDrag = (e) => {
+    if (!isDragging) return;
+    chatbotRef.current.style.left = `${e.clientX - dragOffset.x}px`;
+    chatbotRef.current.style.top = `${e.clientY - dragOffset.y}px`;
+  };
+
+  const handleDragEnd = () => {
+    setIsDragging(false);
   };
 
   return (
@@ -105,7 +122,7 @@ export default function UserLogin() {
           </button>
         </div>
         <div className="userLog-right-container">
-        <p className="login-line1">
+          <p className="login-line1">
             <b>Start with Your Registration</b>
           </p>
           <Link to="/user/signup">
@@ -165,17 +182,6 @@ export default function UserLogin() {
                     required 
                   />
                 </div>
-                {/* <div className="userLog-form-group">
-                  <label htmlFor="date_of_birth">Date of Birth</label>
-                  <input 
-                    type="date" 
-                    id="date_of_birth" 
-                    name="date_of_birth" 
-                    value={formData.date_of_birth}
-                    onChange={handleInputChange}
-                    required 
-                  />
-                </div> */}
                 <button 
                   className="userLog-register-btn" 
                   id="submitButton" 
@@ -190,10 +196,18 @@ export default function UserLogin() {
       </div>
 
       {showChatbot && (
-        <div className="chatbot-modal">
+        <div
+          className="chatbot-modal"
+          ref={chatbotRef}
+          onMouseDown={handleDragStart}
+          onMouseMove={handleDrag}
+          onMouseUp={handleDragEnd}
+          onMouseLeave={handleDragEnd}
+          style={{ position: "absolute", top: "10%", left: "10%" , height: "62%" }}
+        >
           <div className="chatbot-header">
             <h3>Simple Swastha AI Chatbot</h3>
-            <button onClick={handleChatbotToggle}>Close</button>
+            <button onClick={handleChatbotToggle} className='botClose'>X</button>
           </div>
           <div className="chatbot-messages">
             {messages.map((msg, index) => (
@@ -207,9 +221,10 @@ export default function UserLogin() {
               type="text"
               value={userInput}
               onChange={(e) => setUserInput(e.target.value)}
-              placeholder="Type your symptoms here..."
+              placeholder="Type your symptoms here..."  
+              className='botInput'
             />
-            <button onClick={handleUserInput}>Send</button>
+            <button onClick={handleUserInput} className='botSent'>Send</button>
           </div>
         </div>
       )}
