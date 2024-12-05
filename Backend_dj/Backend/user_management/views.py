@@ -1,71 +1,68 @@
-from rest_framework import viewsets, status
-from rest_framework.decorators import action
+from rest_framework import status
+from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
-from django.contrib.auth import authenticate
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
+from django.contrib.auth import authenticate, login
 from .models import User
 from .serializers import UserRegistrationSerializer
-from rest_framework.permissions import IsAuthenticated
-from .serializers import UserUpdateSerializer
-from django.contrib.auth.hashers import make_password
 from django.views.decorators.csrf import csrf_exempt
+import json
+from django.shortcuts import render, get_object_or_404
 
-class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserRegistrationSerializer
-    permission_classes = [AllowAny]
-
-    @action(detail=False, methods=['post'], url_path='register')
-    def register(self, request):
-        serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            if User.objects.filter(phone_no=serializer.validated_data['phone_no']).exists():
-                return Response({'message': 'Phone number already registered'}, status=status.HTTP_400_BAD_REQUEST)
-            
-            serializer.save(password=make_password(serializer.validated_data['password']))
-            return Response({'message': 'Registration successful'}, status=status.HTTP_201_CREATED)
-        
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    @action(detail=False, methods=['post'], url_path='login')
-    def login(self, request):
+# Register User view
+@api_view(['POST'])
+def register_user(request):
+    if request.method == 'POST':
         phone_no = request.data.get('phone_no')
+        username = request.data.get('name')
+        email = request.data.get('email')
         password = request.data.get('password')
 
-        if not phone_no or not password:
-            return Response(
-                {'error': 'Phone number and password are required'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        # Check if the phone number already exists
+        if User.objects.filter(phone_no=phone_no).exists():
+            return Response({'message': 'Phone number already exists'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Create the user
+        user = User.objects.create_user(username=username, phone_no=phone_no, email=email, password=password)
+        return Response({'message': 'User registered successfully'}, status=status.HTTP_201_CREATED)
+    
+    return Response({'error': 'Invalid request'}, status=status.HTTP_400_BAD_REQUEST)
 
-        user = authenticate(request, username=phone_no, password=password)
 
-        if user:
+# Login User view
+@csrf_exempt
+@api_view(['POST'])
+def user_login(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        phone_no = data.get('phone_no')
+        password = data.get('password')
+        
+        # Authenticate the user
+        user = authenticate(request, phone_no=phone_no, password=password)
+        
+        if user is not None:
+            login(request, user)
             return Response({
-                'user_id': user.id,
+                'message': 'Login successful', 
                 'username': user.username,
-                'role': user.role,
-                'message': 'Login successful'
-            }, status=status.HTTP_200_OK)
-
-        return Response(
-            {'error': 'Invalid credentials'},
-            status=status.HTTP_401_UNAUTHORIZED
-        )
+                'phone_no': user.phone_no,  # Include phone_no
+                'email': user.email  # Include email
+            })
+        else:
+            return Response({'message': 'Invalid phone number or password'}, status=status.HTTP_400_BAD_REQUEST)
     
-class UserUpdateViewSet(viewsets.ModelViewSet):
-    serializer_class = UserUpdateSerializer
-    permission_classes = [IsAuthenticated]
-    
-    def get_queryset(self):
-        return User.objects.filter(id=self.request.user.id)
+    return Response({'error': 'Invalid request'}, status=status.HTTP_400_BAD_REQUEST)
 
-    def update(self, request, *args, **kwargs):
-        partial = kwargs.pop('partial', False)
-        instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
-        return Response(serializer.data)
+def user_detail(request, id):
+    user = get_object_or_404(User, pk=id)  # Retrieve the user with the given ID
+    
+    if request.method == 'POST':
+        form = UserForm(request.POST, instance=user)  # Bind the form with the existing user data
+        if form.is_valid():
+            form.save()  # Save the updated user data
+            return redirect('user_detail', id=user.id)  # Redirect to the updated user's detail page
+    else:
+        form = UserForm(instance=user)  # Initialize the form with the existing user data
+
+    return render(request, 'user_detail.html', {'user': user, 'form': form})

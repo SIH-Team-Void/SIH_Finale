@@ -19,22 +19,19 @@ export default function UserAccount() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
-
   useEffect(() => {
     try {
       const storedUserData = localStorage.getItem('userData');
+      console.log(storedUserData)
       if (storedUserData) {
         const parsedUserData = JSON.parse(storedUserData);
         setUserData(parsedUserData);
-      } else {
-        navigate('/user');  // Redirect if no user data is found
       }
     } catch (error) {
       console.error('Error parsing user data:', error);
       navigate('/user');  // Handle corrupted or invalid JSON gracefully
     }
   }, [navigate]);
-  
 
   const handleLogout = () => {
     localStorage.removeItem('userData');
@@ -44,7 +41,8 @@ export default function UserAccount() {
   const handleUpdateProfile = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem('token'); // Assumes token stored during login
+      const token = localStorage.getItem('token');
+      console.log(token)
       const response = await axios.put(`/api/users/${userData.id}/`, userData, {
         headers: { 'Authorization': `Token ${token}` }
       });
@@ -73,11 +71,11 @@ export default function UserAccount() {
         <p>{userData.email || 'No email provided'}</p>
         <div>
           <strong>Details:</strong>
-          <p>Phone: {userData.phone_no}</p>
+          <p>Phone: {userData.phone_no || 'No phone number provided'}</p>
           <p>Gender: {userData.gender || 'Not specified'}</p>
           <p>Blood Group: {userData.blood_group || 'Not specified'}</p>
           <p>Date of Birth: {userData.date_of_birth || 'Not specified'}</p>
-          <p>Role: {userData.role}</p>
+          <p>Role: {userData.role || 'Not specified'}</p>
         </div>
         <button className="userAccount-change-password" onClick={() => setIsModalOpen(true)}>
           Update Profile
@@ -119,7 +117,7 @@ export default function UserAccount() {
                   <input 
                     type="text" 
                     name="phone_no" 
-                    value={userData.phone_no} 
+                    value={userData.phone_no || ''} 
                     onChange={handleInputChange} 
                   />
                 </div>
