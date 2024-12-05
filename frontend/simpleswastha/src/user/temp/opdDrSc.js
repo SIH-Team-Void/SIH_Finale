@@ -42,11 +42,15 @@ export default function OpdDrSc() {
 
   const fetchAvailableSlots = async (doctorId, date) => {
     try {
-      const formattedDate = date.toISOString().split('T')[0];
-      console.log("Fetching slots for doctorId:", doctorId, "and date:", formattedDate);
+      // Adjust the date to local timezone
+      const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+        .toISOString()
+        .split('T')[0];
 
-      const response = await fetch(`http://localhost:8000/api/bookings/?doctor_id=${doctorId}&date=${formattedDate}`);
-      console.log("API endpoint:", `http://localhost:8000/api/bookings/?doctor_id=${doctorId}&date=${formattedDate}`);
+      console.log("Fetching slots for doctorId:", doctorId, "and date:", localDate);
+
+      const response = await fetch(`http://localhost:8000/api/bookings/?doctor_id=${doctorId}&date=${localDate}`);
+      console.log("API endpoint:", `http://localhost:8000/api/bookings/?doctor_id=${doctorId}&date=${localDate}`);
 
       if (response.ok) {
         const data = await response.json();
@@ -64,9 +68,51 @@ export default function OpdDrSc() {
 
   const dateList = generateDates(startDate);
 
+  const handleBooking = async () => {
+    const patientName = localStorage.getItem("username"); // Retrieve patient name from local storage
+    
+    if (!patientName) {
+      alert("Patient name is missing. Please log in or register.");
+      return;
+    }
+  
+    // Prepare data for the request
+    const bookingData = {
+      patient_name: patientName,
+      is_booked: true,
+    };
+  
+    try {
+      // Send PATCH request to update the booking slot with patient details
+      console.log(selectedSlot.booking_id);
+      const response = await fetch(`http://localhost:8000/api/bookings/${selectedSlot.booking_id}/`, {
+        method: "PATCH", // Use PATCH for partial updates; use POST if you are creating a new booking
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(bookingData),
+      });
+  
+      if (response.ok) {
+        alert("Slot booked successfully!");
+        // Refresh slots after booking to reflect changes in the UI
+        fetchAvailableSlots(doctor.doctor_id, selectedDate);
+        setSelectedSlot(null); // Reset selected slot
+      } else {
+        const errorData = await response.json();
+        alert(`Failed to book the slot: ${errorData.detail || 'Please try again.'}`);
+      }
+    } catch (error) {
+      console.error("Error booking the slot:", error);
+      alert("An error occurred while booking the slot.");
+    }
+  };
+  
+
   const handleDateClick = (dateObj) => {
     console.log("Date clicked:", dateObj.date);
     setSelectedDate(dateObj.fullDate);
+    fetchAvailableSlots(doctor.doctor_id, dateObj.fullDate);  // Trigger the fetch directly here
   };
 
   const handleSlotClick = (slot) => {
@@ -135,34 +181,30 @@ export default function OpdDrSc() {
         <div className="container">
           <h1>Time Slots</h1>
           <div className="time-slots">
-            {availableSlots.length > 0 ? (
-              availableSlots.map((slot, index) => (
-                <div
-                  key={slot.booking_id}
-                  className={`time-slot ${selectedSlot?.booking_id === slot.booking_id ? "selected" : ""} ${
-                    index % 2 === 0 ? "green" : "red"
-                  }`}
-                  onClick={() => handleSlotClick(slot)}
-                >
-                  {slot.start_time} - {slot.end_time}
-                </div>
-              ))
-            ) : (
-              <p>No available time slots</p>
-            )}
+          {availableSlots.length > 0 ? (
+            availableSlots.map((slot) => (
+              <div
+                key={slot.booking_id}
+                className={`time-slot ${selectedSlot?.booking_id === slot.booking_id ? "selected" : ""} ${
+                  slot.is_booked ? "red" : "green"
+                }`}
+                onClick={() => handleSlotClick(slot)}
+              >
+                {slot.start_time} - {slot.end_time}
+              </div>
+            ))
+          ) : (
+            <p>No available time slots</p>
+          )}
           </div>
+
 
           {/* Add the BOOK button */}
           <div className="book-button-container">
             <button 
               className="book-button" 
               disabled={!selectedSlot} 
-              onClick={() => {
-                if (selectedSlot) {
-                  console.log("Booking slot:", selectedSlot);
-                  // Call booking API or logic to book the slot
-                }
-              }}
+              onClick={handleBooking}
             >
               BOOK
             </button>
