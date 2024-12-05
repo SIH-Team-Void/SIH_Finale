@@ -4,7 +4,7 @@ body {
     margin: 0;
     font-family: "Poppins", sans-serif;
     background-color: #f0f4f7;
-    overflow: hidden;
+    /* overflow: hidden;  Aastha ne bola nikalne */
 }
 
 .main-container {
