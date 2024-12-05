@@ -8,6 +8,9 @@ import AddBed from './admin/temp/addBed';
 import OPDSc from './admin/temp/opdSc';
 import ManageBed from './admin/temp/manageBed';
 import HospAccount from './admin/temp/account';
+import Storage from './admin/temp/storage';
+import Sales from './admin/temp/sales';
+import Vaim from './admin/temp/vaim';
 import DrSc from './admin/temp/drSc';
 import BedNoti from './admin/temp/bedNo';
 import Inventory from './admin/temp/inventory';
@@ -44,6 +47,9 @@ function App() {
           <Route path="/admin/inventory" element={<Inventory />} />
           <Route path="/admin/account" element={<HospAccount />} />
           <Route path="/admin/bedNo" element={<BedNoti />} />
+          <Route path="/admin/inventory/storage" element={<Storage />} />
+          <Route path="/admin/inventory/sales" element={<Sales />} />
+          <Route path="/admin/inventory/vaim" element={<Vaim />} />
 
           {/* User Portal */}
           <Route path="/user" element={<UserLogin />} />
