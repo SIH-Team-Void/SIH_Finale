@@ -68,9 +68,9 @@ const GovermentSc = () => {
     setFilteredData(filtered);
   }, [filters, data]);
 
-  if (loading) {
+  /*if (loading) {
     return <p>Loading data...</p>;
-  }
+  }*/
 
   return (
     <div className="userGoveSc-body">
