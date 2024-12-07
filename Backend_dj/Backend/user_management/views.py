@@ -66,3 +66,4 @@ def user_detail(request, id):
         form = UserForm(instance=user)  # Initialize the form with the existing user data
 
     return render(request, 'user_detail.html', {'user': user, 'form': form})
+
