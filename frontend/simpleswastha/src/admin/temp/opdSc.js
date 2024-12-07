@@ -96,6 +96,7 @@ export default function OpdSc() {
         <div className="opdSc-options">
           <Link to="/admin/opdSc" className="drSc-activity">Manage Existing Schedule</Link>
           <Link to="/admin/drSc" className="drSc-activity">Create New Doctor Schedule</Link>
+          <Link to="/admin/walkIn" className="drSc-activity">Manage Walk-in</Link>
         </div>
         <div className="opdSc-forminputs" id="formContent">
           <form>

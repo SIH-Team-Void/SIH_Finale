@@ -7,6 +7,7 @@ from datetime import datetime
 from rest_framework.decorators import action
 from django.http import JsonResponse
 from rest_framework.decorators import api_view
+from api.views import HospitalRegistrationView
 
 class DoctorViewSet(viewsets.ModelViewSet):
     queryset = Doctor.objects.all()
@@ -15,10 +16,6 @@ class DoctorViewSet(viewsets.ModelViewSet):
 class SlotViewSet(viewsets.ModelViewSet):
     queryset = Slot.objects.all()
     serializer_class = SlotSerializer
-
-from rest_framework.response import Response
-from .models import OPDBooking  # Import the model
-from .serializers import OPDBookingSerializer  # Import the serializer
 
 class OPDBookingViewSet(viewsets.ViewSet):
     def list(self, request):
