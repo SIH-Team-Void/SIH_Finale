@@ -315,9 +315,10 @@ body {
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
-    margin-top: 5%;
+    margin-top: 1%;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
     margin-bottom: 5px;
+    margin-right: 10px;
 }
 
 .botInput {
@@ -327,15 +328,19 @@ body {
     border: none;
     border-radius: 20px;
     font-weight: 600;
-    margin-top: 5%;
+    margin-top: 1%;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    margin-left: 5px;
+    margin-left: 10px;
 }
 
 .botClose {
     width: 12%;
-    padding: 10px;
     background-color: rgba(223, 242, 170, 1);
     border: none;
+    font-weight: bolder;
+}
+
+.chatbot-header span{
+    font-size: larger;
     font-weight: bolder;
 }
