@@ -34,7 +34,7 @@ export default function OpdDr() {
           <div className="opdDr-search">
             <img src={searchIcon} alt="search" />
             <div className="opdDr-search-bar">
-              <input type="text" placeholder="Search By Hospital's Name" />
+              <input type="text" placeholder="Search By Doctor's Name" />
             </div>
           </div>
           <div className="opdDr-Dr-list">
@@ -53,7 +53,7 @@ export default function OpdDr() {
                     <div className="opdDr-Dr-cost">
                       <div className="opdDr-Dr-fee">
                         <h3>₹ {doctor.fees}</h3>
-                        <span>Doctors Fees</span>
+                        <span>Doctor's Fees</span>
                       </div>
                     </div>
                     <button onClick={() => handleDoctorClick(doctor)} className="opdDr-btn">

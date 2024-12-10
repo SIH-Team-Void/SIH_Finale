@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import L from 'leaflet';
 import '../css/goveMap.css';
-import logo from "../img/nav_logo.png"
+import logo from "../img/nav_logo.png";
 import Navbar from '../goverComponents/goveNav';
 
 const HospitalsMap = () => {
@@ -11,9 +11,22 @@ const HospitalsMap = () => {
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
 
+  const fetchHospitalData = async () => {
+    try {
+      const response = await fetch('http://127.0.0.1:8000/api/hospital/register/');
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`);
+      }
+      const data = await response.json();
+      setHospitals(data);
+    } catch (error) {
+      console.error('Failed to fetch hospital data:', error);
+    }
+  };
+
   useEffect(() => {
     if (mapRef.current && !mapInstanceRef.current) {
-      const mapInstance = L.map(mapRef.current).setView([20.5937, 78.9629], 5); // Center the map on India
+      const mapInstance = L.map(mapRef.current).setView([20.5937, 78.9629], 5);
 
       L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
@@ -23,53 +36,15 @@ const HospitalsMap = () => {
       mapInstanceRef.current = mapInstance;
     }
 
-    const hospitalsData = [
-      {
-        name: 'City Hospital',
-        lat: 19.0760,
-        lng: 72.8777,
-        contact: '123-456-7890',
-        address: 'Mumbai, Maharashtra',
-      },
-      {
-        name: 'Global Care Hospital',
-        lat: 28.7041,
-        lng: 77.1025,
-        contact: '098-765-4321',
-        address: 'Delhi, India',
-      },
-      {
-        name: 'Sunrise Medical Center',
-        lat: 13.0827,
-        lng: 80.2707,
-        contact: '789-123-4560',
-        address: 'Chennai, Tamil Nadu',
-      },
-      {
-        name: 'Greenfield Hospital',
-        lat: 22.5726,
-        lng: 88.3639,
-        contact: '456-789-0123',
-        address: 'Kolkata, West Bengal',
-      },
-      {
-        name: 'Healing Touch Hospital',
-        lat: 12.9716,
-        lng: 77.5946,
-        contact: '321-654-9870',
-        address: 'Bengaluru, Karnataka',
-      },
-    ];
-    setHospitals(hospitalsData);
+    fetchHospitalData();
 
-    // Cleanup function
     return () => {
       if (mapInstanceRef.current) {
         mapInstanceRef.current.remove();
         mapInstanceRef.current = null;
       }
     };
-  }, []); // Empty dependency array ensures this runs only once
+  }, []);
 
   const handleSearchLocation = () => {
     if (!latitude || !longitude || isNaN(parseFloat(latitude)) || isNaN(parseFloat(longitude))) {
@@ -77,13 +52,11 @@ const HospitalsMap = () => {
       return;
     }
 
-    // Additional check to ensure map is initialized
     if (!mapInstanceRef.current) {
       console.error('Map not initialized');
       return;
     }
 
-    // Remove existing markers
     mapInstanceRef.current.eachLayer((layer) => {
       if (layer instanceof L.Marker) {
         mapInstanceRef.current.removeLayer(layer);
@@ -95,7 +68,6 @@ const HospitalsMap = () => {
 
     mapInstanceRef.current.setView([parsedLat, parsedLng], 13);
 
-    // Add a blue marker for the searched location
     L.marker([parsedLat, parsedLng], {
       icon: L.icon({
         iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png',
@@ -106,22 +78,18 @@ const HospitalsMap = () => {
       })
     }).addTo(mapInstanceRef.current).bindPopup('Searched location').openPopup();
 
-    // Ensure hospitals data is available before calling .map()
     if (Array.isArray(hospitals) && hospitals.length > 0) {
       const hospitalsWithDistance = hospitals.map((hospital) => ({
         ...hospital,
-        distance: calculateDistance(parsedLat, parsedLng, hospital.lat, hospital.lng),
+        distance: calculateDistance(parsedLat, parsedLng, hospital.hosp_lat, hospital.hosp_log),
       }));
 
-      // Sort hospitals by distance
       hospitalsWithDistance.sort((a, b) => a.distance - b.distance);
 
-      // Clear existing hospital cards and add the new ones
       const hospitalCards = document.getElementById('hospital-cards');
       hospitalCards.innerHTML = '';
       hospitalsWithDistance.forEach((hospital) => {
-        // Add hospital marker
-        L.marker([hospital.lat, hospital.lng], {
+        L.marker([hospital.hosp_lat, hospital.hosp_log], {
           icon: L.icon({
             iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
             iconSize: [25, 41],
@@ -129,15 +97,14 @@ const HospitalsMap = () => {
             popupAnchor: [1, -34],
             shadowSize: [41, 41],
           })
-        }).addTo(mapInstanceRef.current).bindPopup(`${hospital.name}<br>${hospital.contact}<br>${hospital.address}`);
+        }).addTo(mapInstanceRef.current).bindPopup(`${hospital.hosp_name}<br>${hospital.hosp_contact_no}<br>${hospital.hosp_address}`);
 
-        // Create hospital card and append it to the list
         const card = document.createElement('div');
         card.classList.add('hospMap-hospital-card');
         card.innerHTML = `
-          <h4>${hospital.name}</h4>
-          <p>Contact: ${hospital.contact}</p>
-          <p>Address: ${hospital.address}</p>
+          <h4>${hospital.hosp_name}</h4>
+          <p>Contact: ${hospital.hosp_contact_no}</p>
+          <p>Address: ${hospital.hosp_address}</p>
           <p>Distance: ${hospital.distance.toFixed(2)} km</p>
         `;
         hospitalCards.appendChild(card);
@@ -147,9 +114,8 @@ const HospitalsMap = () => {
     }
   };
 
-  // Function to calculate distance between two coordinates (Haversine formula)
   const calculateDistance = (lat1, lon1, lat2, lon2) => {
-    const R = 6371; // Radius of the Earth in km
+    const R = 6371;
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
     const a =

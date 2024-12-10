@@ -6,16 +6,28 @@ import '../css/drSc.css';
 
 export default function DrSchedule() {
   const navigate = useNavigate();
-  const [hospitalId, setHospitalId] = useState(34); //dummy number
+  const [hospitalId, setHospitalId] = useState(null); // Initially null
   const [modalMessage, setModalMessage] = useState('');
   const [showModal, setShowModal] = useState(false);
 
+  // Fetch the hospital ID on component mount
   useEffect(() => {
-    const storedHospitalId = localStorage.getItem('hospitalId');
-    if (storedHospitalId) {
-      setHospitalId(storedHospitalId);
-    }
-  }, [navigate]);
+    const fetchHospitalId = async () => {
+      try {
+        const response = await axios.get('http://localhost:8000/api/hospital/get-hospital-id/', {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`, // Use your auth token
+          },
+        });
+        setHospitalId(response.data.hosp_ID);
+      } catch (error) {
+        console.error('Error fetching hospital ID:', error.response ? error.response.data : error.message);
+        alert('Failed to fetch hospital ID. Please check your connection or log in again.');
+      }
+    };
+
+    fetchHospitalId();
+  }, []);
 
   const handleAddDoctor = async (e) => {
     e.preventDefault();
@@ -26,7 +38,7 @@ export default function DrSchedule() {
       doctor_phone: e.target.elements.drContact.value,
       education: e.target.elements.education.value,
       department: e.target.elements.department.value,
-      hospital_id: hospitalId,
+      hospital_id: hospitalId, // Use the fetched hospital ID
       fees: e.target.elements.drFee.value,
     };
 
@@ -51,7 +63,7 @@ export default function DrSchedule() {
       end_time: formatTime(e.target.elements.endTime.value),
       interval: e.target.elements.interval.value, // Consider validation
       fees: parseFloat(e.target.elements.bookingFee.value), // Ensure it's a number
-      hospital_id: hospitalId,
+      hospital_id: hospitalId, // Use the fetched hospital ID
     };
 
     try {
@@ -75,6 +87,10 @@ export default function DrSchedule() {
     setModalMessage('');
   };
 
+  if (hospitalId === null) {
+    return <div>Loading...</div>; // Show loading indicator until hospital ID is fetched
+  }
+
   return (
     <div className="drSc-body">
       <Navbar />
@@ -82,57 +98,57 @@ export default function DrSchedule() {
         <div className="drSc-options">
           <Link to="/admin/opdSc" className="drSc-activity">Manage Existing Schedule</Link>
           <Link to="/admin/drSc" className="drSc-activity">Create New Doctor Schedule</Link>
+          <Link to="/admin/walkIn" className="drSc-activity">Manage Walk-in</Link>
         </div>
 
         <form onSubmit={handleAddDoctor}>
           <h3>Add Doctor</h3>
           <div className="drSc-form-row">
             <div className="drSc-form-group">
-              <label htmlFor="doctorName">Doctor Name</label>
-              <input type="text" id="doctorName" name="doctorName" placeholder="Doctor Name" required />
+                <label htmlFor="doctorName">Doctor Name</label>
+                <input type="text" id="doctorName" name="doctorName" placeholder="Doctor Name" required />
+              </div>
+              <div className="drSc-form-group">
+                <label htmlFor="department">Department</label>
+                <input type="text" id="department" name="department" placeholder="Department" required />
+              </div>
             </div>
-            <div className="drSc-form-group">
-              <label htmlFor="department">Department</label>
-              <input type="text" id="department" name="department" placeholder="Department" required />
-            </div>
-          </div>
 
-          <div className="drSc-form-row">
-            <div className="drSc-form-group">
-              <label htmlFor="education">Education</label>
-              <input type="text" id="education" name="education" placeholder="Doctor's Education" required />
+            <div className="drSc-form-row">
+              <div className="drSc-form-group">
+                <label htmlFor="education">Education</label>
+                <input type="text" id="education" name="education" placeholder="Doctor's Education" required />
+              </div>
+              <div className="drSc-form-group">
+                <label htmlFor="hospitalId">Hospital ID</label>
+                <input type="number" id="hospitalId" name="hospitalId" placeholder="Hospital ID" required />
+              </div>
             </div>
-            <div className="drSc-form-group">
-              <label htmlFor="hospitalId">Hospital ID</label>
-              <input type="number" id="hospitalId" name="hospitalId" placeholder="Hospital ID" required />
-            </div>
-          </div>
 
-          <div className="drSc-form-row">
-            <div className="drSc-form-group">
-              <label htmlFor="drContact">Dr Contact No</label>
-              <input type="tel" id="drContact" name="drContact" placeholder="Doctor's Contact No" required />
+            <div className="drSc-form-row">
+              <div className="drSc-form-group">
+                <label htmlFor="drContact">Dr Contact No</label>
+                <input type="tel" id="drContact" name="drContact" placeholder="Doctor's Contact No" required />
+              </div>
+              <div className="drSc-form-group">
+                <label htmlFor="drEmail">Dr Email</label>
+                <input type="email" id="drEmail" name="drEmail" placeholder="Doctor's Email" required />
+              </div>
             </div>
-            <div className="drSc-form-group">
-              <label htmlFor="drEmail">Dr Email</label>
-              <input type="email" id="drEmail" name="drEmail" placeholder="Doctor's Email" required />
-            </div>
-          </div>
 
-          <div className="drSc-form-row">
-            <div className="drSc-form-group">
-              <label htmlFor="drFee">Doctor Fee</label>
-              <input type="number" id="drFee" name="drFee" placeholder="Enter doctor's fee" required />
-            </div>
+            <div className="drSc-form-row">
+              <div className="drSc-form-group">
+                <label htmlFor="drFee">Doctor Fee</label>
+                <input type="number" id="drFee" name="drFee" placeholder="Enter doctor's fee" required />
+              </div>
           </div>
-
           <button className="drSc-register-btn" type="submit">ADD DOCTOR</button>
         </form>
 
         <form onSubmit={handleAddOPD}>
           <h3>OPD Slot</h3>
           <div className="drSc-form-row">
-            <div className="drSc-form-group">
+          <div className="drSc-form-group">
               <label htmlFor="doctorID">Doctor ID</label>
               <input type="number" id="doctorID" name="doctorID" placeholder="Doctor ID" required />
             </div>
@@ -163,7 +179,6 @@ export default function DrSchedule() {
               <input type="number" id="bookingFee" name="bookingFee" placeholder="Booking Fee" required />
             </div>
           </div>
-
           <button className="drSc-register-btn" type="submit">ADD SLOT</button>
         </form>
       </div>
