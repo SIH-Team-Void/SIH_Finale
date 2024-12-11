@@ -545,9 +545,9 @@ export default function ManageBed() {
                             MANAGE REQUEST
                         </button>
                     </Link>
-                    <Link to="/admin/bedlist">
+                    {/* <Link to="/admin/bedlist">
                         <button className="bedNo-activity">BED LIST</button>
-                    </Link>
+                    </Link> */}
                 </div>
                 <div className="manageBed-content">
                     <h3>Select Ward</h3>

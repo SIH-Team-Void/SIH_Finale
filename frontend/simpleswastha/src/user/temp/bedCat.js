@@ -631,12 +631,12 @@ const handleBookingSubmit = async (event) => {
     <div className="bedCat-body">
       <Navbar />
       <div className="bedCat-container">
-        {hospital && (
-          <div className="bedCat-hospital-info">
-            <h2>{hospital.hosp_name}</h2>
-            <p>{hospital.hosp_address}</p>
-          </div>
-        )}
+        {/* {hospital && (
+          // <div className="bedCat-hospital-info">
+          //   <h2>{hospital.hosp_name}</h2>
+          //   <p>{hospital.hosp_address}</p>
+          // </div>
+        )} */}
         
         <h3 className="bedCat-b3">Select Bed Category for Booking</h3>
         

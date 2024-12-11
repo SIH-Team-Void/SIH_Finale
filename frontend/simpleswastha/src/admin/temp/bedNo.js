@@ -874,9 +874,9 @@ export default function BedNo() {
         <Link to="/admin/bedNo">
           <button className="bedNo-activity">MANAGE REQUEST</button>
         </Link>
-        <Link to="/admin/bedlist">
+        {/* <Link to="/admin/bedlist">
                         <button className="bedNo-activity">BED LIST</button>
-                    </Link>
+                    </Link> */}
       </div>
 
       {error && (

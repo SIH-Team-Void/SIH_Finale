@@ -61,6 +61,24 @@ export default function goveHome() {
             </div>
           </div>
           </Link>
+
+          <Link to="/government/centralPa">
+          <div className="goveHome-option-box" style={{ backgroundColor: '#b5ebba' }}>
+            <div className="goveHome-icon-option" style={{ backgroundColor: '#d9fee1' }}>
+              <img src={govScImage} alt="Calendar" />
+            </div>
+            <div className="goveHome-text-box" style={{ color: '#0d3f1b' }}>
+              <h3>
+                <b>Centralized Patient History</b>
+              </h3>
+              <br />
+              <p style={{ fontSize: '13px' }}>Find the history of the user.</p>
+            </div>
+            <div className="goveHome-arrow-icon">
+              <img src={OPDNextImage} alt="Next Arrow" />
+            </div>
+          </div>
+          </Link>
       </div>
     </div>
   );

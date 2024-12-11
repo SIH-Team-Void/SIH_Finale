@@ -6,7 +6,7 @@ import '../css/drSc.css';
 
 export default function DrSchedule() {
   const navigate = useNavigate();
-  const [hospitalId, setHospitalId] = useState(null); // Initially null
+  const [hospitalId, setHospitalId] = useState(34); // Initially null
   const [modalMessage, setModalMessage] = useState('');
   const [showModal, setShowModal] = useState(false);
 
@@ -22,7 +22,6 @@ export default function DrSchedule() {
         setHospitalId(response.data.hosp_ID);
       } catch (error) {
         console.error('Error fetching hospital ID:', error.response ? error.response.data : error.message);
-        alert('Failed to fetch hospital ID. Please check your connection or log in again.');
       }
     };
 

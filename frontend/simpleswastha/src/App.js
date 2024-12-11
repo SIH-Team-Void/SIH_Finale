@@ -93,7 +93,7 @@ import Sales from './admin/temp/sales';
 import WalkIn from './admin/temp/walkIn';
 import Vaim from './admin/temp/vaim';
 import DrSc from './admin/temp/drSc';
-// import BedList from './admin/temp/bedlist';
+import CentralPa from './goverment/temp/centralPa';
 import BedNoti from './admin/temp/bedNo';
 import Inventory from './admin/temp/inventory';
 import UserLogin from './user/temp/userLogin';
@@ -132,7 +132,7 @@ function App() {
           <Route path="/admin/inventory/storage" element={<Storage />} />
           <Route path="/admin/inventory/sales" element={<Sales />} />
           <Route path="/admin/inventory/vaim" element={<Vaim />} />
-          {/* <Route path="/admin/bedlist" element={<BedList />} /> */}
+          <Route path="/admin/bedlist" element={<BedList />} />
           <Route path="/admin/walkIn" element={<WalkIn />} />
 
           {/* User Portal */}
@@ -154,6 +154,7 @@ function App() {
           <Route path="/government" element={<GovernmentHome />} />
           <Route path="/government/map" element={<GovernmentMap />} />
           <Route path="/government/schemes" element={<GovernmentSc />} />
+          <Route path="/government/centralPa" element={<CentralPa />} />
 
           {/* Catch-All Route */}
           <Route path="*" element={<div>404 - Page Not Found</div>} />

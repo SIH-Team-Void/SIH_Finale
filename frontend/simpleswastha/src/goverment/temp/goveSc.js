@@ -168,7 +168,7 @@ const GoveScForm = () => {
             console.log('Scheme Added:', response.data);
             if (response.status === 201) {
                 // Successfully added
-                navigate("/display");
+                alert("Scheme submitted successfully!");
             } else {
                 alert("Error submitting the form");
             }
@@ -220,7 +220,6 @@ const GoveScForm = () => {
                             
                         />
                     </div>
-
                     <div className="goveSc-form-row">
                         {[
                             { label: "Select State", name: "userState" },
