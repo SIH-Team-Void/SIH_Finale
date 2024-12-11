@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "../css/opdDrSc.css";
 import Navbar from "../userComponents/userNavbar";
 import femaleDr1Img from "../img/femaleDr1.png";
@@ -6,15 +7,17 @@ import leftArrow from "../img/left_arr.png";
 import rightArrow from "../img/right_arr.png";
 
 export default function OpdDrSc() {
+  const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [startDate, setStartDate] = useState(new Date());
   const [availableSlots, setAvailableSlots] = useState([]);
   const [doctor, setDoctor] = useState(null);
-
+  const [loading, setLoading] = useState(false);
+  const [slots, setSlots] = useState([]);
+  
   useEffect(() => {
     const doctorData = JSON.parse(sessionStorage.getItem("selectedDoctor"));
-    console.log("Fetched doctor data from sessionStorage:", doctorData);
     if (doctorData) {
       setDoctor(doctorData);
       fetchAvailableSlots(doctorData.doctor_id, selectedDate);
@@ -69,44 +72,50 @@ export default function OpdDrSc() {
   const dateList = generateDates(startDate);
 
   const handleBooking = async () => {
-    const patientName = localStorage.getItem("username"); // Retrieve patient name from local storage
+    const patientName = localStorage.getItem("username");
     
     if (!patientName) {
-      alert("Patient name is missing. Please log in or register.");
+      alert("Please log in or register to book an appointment.");
       return;
     }
-  
-    // Prepare data for the request
-    const bookingData = {
-      patient_name: patientName,
-      is_booked: true,
-    };
-  
+
+    if (!selectedSlot) {
+      alert("Please select a time slot.");
+      return;
+    }
+
+    setLoading(true);
+
     try {
-      // Send PATCH request to update the booking slot with patient details
-      console.log(selectedSlot.booking_id);
-      const response = await fetch(`http://localhost:8000/api/bookings/${selectedSlot.booking_id}/`, {
-        method: "PATCH", // Use PATCH for partial updates; use POST if you are creating a new booking
+      // Create Stripe checkout session
+      const response = await fetch('http://localhost:8000/api/create-checkout-session/', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(bookingData),
+        body: JSON.stringify({
+          booking_id: selectedSlot.booking_id,
+          patient_name: patientName,
+        }),
       });
-  
-      if (response.ok) {
-        alert("Slot booked successfully!");
-        // Refresh slots after booking to reflect changes in the UI
-        fetchAvailableSlots(doctor.doctor_id, selectedDate);
-        setSelectedSlot(null); // Reset selected slot
-      } else {
-        const errorData = await response.json();
-        alert(`Failed to book the slot: ${errorData.detail || 'Please try again.'}`);
+
+      if (!response.ok) {
+        throw new Error('Failed to create checkout session');
       }
+
+      const { checkout_url } = await response.json();
+      
+      // Redirect to Stripe Checkout
+      window.location.href = checkout_url;
+
     } catch (error) {
-      console.error("Error booking the slot:", error);
-      alert("An error occurred while booking the slot.");
+      console.error('Error creating checkout session:', error);
+      alert('Failed to process payment. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
+
   
 
   const handleDateClick = (dateObj) => {
@@ -116,7 +125,10 @@ export default function OpdDrSc() {
   };
 
   const handleSlotClick = (slot) => {
-    console.log("Slot selected:", slot);
+    if (slot.is_booked) {
+      alert("This slot is already booked.");
+      return;
+    }
     setSelectedSlot(slot);
   };
 
@@ -130,6 +142,58 @@ export default function OpdDrSc() {
     const newStartDate = new Date(startDate);
     newStartDate.setDate(startDate.getDate() + 7);
     setStartDate(newStartDate);
+  };
+
+  const handleProceedToPayment = async () => {
+    if (!selectedSlot) {
+      alert("Please select a slot first.");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const patientName = localStorage.getItem("username");
+      if (!patientName) {
+        alert("Please log in or register to book a slot.");
+        setLoading(false);
+        return;
+      }
+
+      // Create Stripe checkout session
+      const response = await fetch("http://localhost:8000/api/create-checkout-session/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          booking_id: selectedSlot.booking_id,
+          patient_name: patientName,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to create checkout session");
+      }
+
+      const { checkout_url } = await response.json();
+      // Mark the slot as booked locally before redirecting
+      setSlots((prevSlots) =>
+        prevSlots.map((slot) =>
+          slot.booking_id === selectedSlot.booking_id
+            ? { ...slot, is_booked: true }
+            : slot
+        )
+      );
+
+      // Redirect to Stripe Checkout
+      window.location.href = checkout_url;
+      } catch (error) {
+      console.error("Error processing payment:", error);
+      alert("Failed to proceed to payment. Please try again.");
+      } finally {
+      setLoading(false);
+      }
   };
 
   return (
@@ -181,32 +245,42 @@ export default function OpdDrSc() {
         <div className="container">
           <h1>Time Slots</h1>
           <div className="time-slots">
-          {availableSlots.length > 0 ? (
-            availableSlots.map((slot) => (
-              <div
+            {availableSlots.length > 0 ? (
+              availableSlots.map((slot) => (
+                <div
                 key={slot.booking_id}
-                className={`time-slot ${selectedSlot?.booking_id === slot.booking_id ? "selected" : ""} ${
-                  slot.is_booked ? "red" : "green"
+                className={`time-slot ${slot.is_booked ? "red" : "green"} ${
+                  selectedSlot && selectedSlot.booking_id === slot.booking_id ? "selected" : ""
                 }`}
                 onClick={() => handleSlotClick(slot)}
               >
                 {slot.start_time} - {slot.end_time}
-              </div>
-            ))
-          ) : (
-            <p>No available time slots</p>
-          )}
+                </div>
+              ))
+            ) : (
+              <p>No available time slots</p>
+            )}
           </div>
 
+          <div className="booking-summary">
+            {selectedSlot && doctor && (
+              <>
+                <h3>Booking Summary</h3>
+                <p>Doctor: Dr. {doctor.doctor_name}</p>
+                <p>Date: {new Date(selectedSlot.date).toLocaleDateString()}</p>
+                <p>Time: {selectedSlot.start_time} - {selectedSlot.end_time}</p>
+                <p>Fees: ₹{doctor.fees}</p>
+              </>
+            )}
+          </div>
 
-          {/* Add the BOOK button */}
           <div className="book-button-container">
             <button 
-              className="book-button" 
-              disabled={!selectedSlot} 
+              className={`book-button ${loading ? 'loading' : ''}`}
+              disabled={!selectedSlot || loading} 
               onClick={handleBooking}
             >
-              BOOK
+              {loading ? 'Processing...' : 'Proceed to Payment'}
             </button>
           </div>
         </div>
@@ -214,3 +288,51 @@ export default function OpdDrSc() {
     </div>
   );
 }
+
+export const CancelPage = () => {
+  const navigate = useNavigate();
+
+  return (
+    <div className="cancel-page">
+      <h1>Payment Cancelled</h1>
+      <p>Your appointment booking was not completed.</p>
+      <button onClick={() => navigate(-1)}>
+        Try Again
+      </button>
+    </div>
+  );
+};
+
+export const SuccessPage = () => {
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const queryParams = new URLSearchParams(window.location.search);
+    const bookingId = queryParams.get('booking_id');
+
+    if (bookingId) {
+      // You can fetch booking details here if needed
+      setLoading(false);
+    } else {
+      setError('Invalid booking reference');
+      setLoading(false);
+    }
+  }, []);
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>{error}</div>;
+
+  return (
+    <div className="success-page">
+      <h1>Payment Successful!</h1>
+      <p>Your appointment has been confirmed.</p>
+      <button onClick={() => navigate('/user/home')}>
+        View My Appointments
+      </button>
+    </div>
+  );
+};
+
+

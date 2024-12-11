@@ -15,8 +15,8 @@ class Vendors(models.Model):
     surgical = models.IntegerField(null=True, blank=True)  # Corrected field name and type
     medicinal = models.IntegerField(null=True, blank=True)  # Corrected field name and type
 
-    def _str_(self):
-        return f"{self.name} - {self.category} - GSTIN: {self.gstin}"
+    def __str__(self):
+        return f"{self.name} - Surgical: {self.surgical}, Medicinal: {self.medicinal} - GSTIN: {self.gstin}"
     
 
 class Inventory(models.Model):
@@ -32,7 +32,7 @@ class Inventory(models.Model):
     Inv_category =models.CharField(max_length=50, choices=CATEGORY_CHOICES, null=False, blank=False) # Optional, e.g., "surgical" or "medicines"
     expiry_date= models.DateField(null=True,blank=True)
     Inv_vendor = models.CharField(max_length=50, null=True, blank=True)
-    def _str_(self):
+    def __str__(self):
         return f"{self.Inv_name} - {self.Inv_quantity} - {self.Inv_price_per_item} items"
 
     def save(self, *args, **kwargs):
