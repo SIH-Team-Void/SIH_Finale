@@ -23,6 +23,15 @@ export default function goveSc() {
             <button className="goveSc-register-btn" type="submit" id="submitButton">Submit</button>
           </form>
           <div className="goveSc-forminputs" id="formContent">
+          <h3 className="goveSc-title">Patient general information</h3>
+          <p><b>Email:</b></p>
+          <p><b>PhoneNo:</b></p>
+          <p><b>Gender:</b></p>
+          <p><b>PhoneNo:</b></p>
+          <p><b>Blood Group:</b></p>
+          <p><b>Date of birth:</b></p>
+          </div>
+          <div className="goveSc-forminputs" id="formContent">
           <h3 className="goveSc-title">Patient history</h3>
           <table>
               <thead>
