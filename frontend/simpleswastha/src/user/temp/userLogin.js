@@ -50,6 +50,7 @@ export default function UserLogin() {
         
         localStorage.setItem('userData', JSON.stringify(userData));
         console.log(localStorage);
+        localStorage.setItem('userMobile', formData.phone_no);
         navigate('/user/Home');
       } else {
         // Handle registration success
