@@ -132,3 +132,18 @@
     background-color: rgba(94, 160, 209, 0.7);
     padding: 5px;
 }
+
+.status-pending {
+    color: #f59e0b;
+    font-weight: bold;
+  }
+  
+  .status-approved {
+    color: #10b981;
+    font-weight: bold;
+  }
+  
+  .status-rejected {
+    color: #ef4444;
+    font-weight: bold;
+  }
