@@ -105,7 +105,8 @@ CORS_ALLOW_HEADERS = [
 ]
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:3000',  # Add your React app's origin here
-    'https://localhost:3000', # You can also include https if you're using it in your local development
+    'https://localhost:3001', # You can also include https if you're using it in your local development
+    'https://localhost:3002',
 ]
 
 # settings.py
@@ -157,7 +158,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Kolkata'
 
 USE_I18N = True
 

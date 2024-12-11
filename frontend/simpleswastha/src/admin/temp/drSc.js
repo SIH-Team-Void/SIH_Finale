@@ -6,27 +6,17 @@ import '../css/drSc.css';
 
 export default function DrSchedule() {
   const navigate = useNavigate();
-  const [hospitalId, setHospitalId] = useState(null); // Initially null
+  const [hospitalId, setHospitalId] = useState(34); // Initially null
   const [modalMessage, setModalMessage] = useState('');
   const [showModal, setShowModal] = useState(false);
+  // const [doctorFees, setDoctorFees] = useState(null); // To store the retrieved doctor's fee
 
   // Fetch the hospital ID on component mount
   useEffect(() => {
-    const fetchHospitalId = async () => {
-      try {
-        const response = await axios.get('http://localhost:8000/api/hospital/get-hospital-id/', {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`, // Use your auth token
-          },
-        });
-        setHospitalId(response.data.hosp_ID);
-      } catch (error) {
-        console.error('Error fetching hospital ID:', error.response ? error.response.data : error.message);
-        alert('Failed to fetch hospital ID. Please check your connection or log in again.');
-      }
-    };
-
-    fetchHospitalId();
+    const storedHospitalId = localStorage.getItem('hospitalId');
+    if (storedHospitalId) {
+      setHospitalId(storedHospitalId);
+    }
   }, []);
 
   const handleAddDoctor = async (e) => {
@@ -56,14 +46,15 @@ export default function DrSchedule() {
     e.preventDefault();
     const formatTime = (timeString) => timeString + ':00'; // Ensure seconds are included
 
+    const doctorId = parseInt(e.target.elements.doctorID.value, 10); // Ensure it's a number
     const slotData = {
-      doctor_id: parseInt(e.target.elements.doctorID.value, 10), // Ensure it's a number
+      doctor_id: doctorId,
       day: e.target.elements.day.value,
       start_time: formatTime(e.target.elements.startTime.value),
       end_time: formatTime(e.target.elements.endTime.value),
       interval: e.target.elements.interval.value, // Consider validation
-      fees: parseFloat(e.target.elements.bookingFee.value), // Ensure it's a number
       hospital_id: hospitalId, // Use the fetched hospital ID
+      online_hours: e.target.elements.onlineDuration.value, 
     };
 
     try {
@@ -87,9 +78,12 @@ export default function DrSchedule() {
     setModalMessage('');
   };
 
-  if (hospitalId === null) {
-    return <div>Loading...</div>; // Show loading indicator until hospital ID is fetched
-  }
+  // const handleDoctorIdChange = (e) => {
+  //   const doctorId = e.target.value;
+  //   if (doctorId) {
+  //     fetchDoctorFees(doctorId);
+  //   }
+  // };
 
   return (
     <div className="drSc-body">
@@ -148,9 +142,16 @@ export default function DrSchedule() {
         <form onSubmit={handleAddOPD}>
           <h3>OPD Slot</h3>
           <div className="drSc-form-row">
-          <div className="drSc-form-group">
+            <div className="drSc-form-group">
               <label htmlFor="doctorID">Doctor ID</label>
-              <input type="number" id="doctorID" name="doctorID" placeholder="Doctor ID" required />
+              <input
+                type="number"
+                id="doctorID"
+                name="doctorID"
+                placeholder="Doctor ID"
+                required
+                // onChange={handleDoctorIdChange}
+              />
             </div>
             <div className="drSc-form-group">
               <label htmlFor="day">Day</label>
@@ -175,8 +176,8 @@ export default function DrSchedule() {
               <input type="text" id="interval" name="interval" placeholder="Slot Interval (e.g., 00:30:00)" required />
             </div>
             <div className="drSc-form-group">
-              <label htmlFor="bookingFee">Booking Fee</label>
-              <input type="number" id="bookingFee" name="bookingFee" placeholder="Booking Fee" required />
+              <label htmlFor="onlineDuration">Online Duration</label>
+              <input type="text" id="onlineDuration" name="onlineDuration" placeholder="Online Duration (e.g., 02:00:00)" required />
             </div>
           </div>
           <button className="drSc-register-btn" type="submit">ADD SLOT</button>
