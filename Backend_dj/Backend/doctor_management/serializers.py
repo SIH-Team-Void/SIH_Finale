@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Doctor, Slot, OPDBooking
+from .models import Doctor, Slot, OPDBooking, WalkInSlot
 
 class DoctorSerializer(serializers.ModelSerializer):
     class Meta:
@@ -25,3 +25,10 @@ class OPDBookingSerializer(serializers.ModelSerializer):
     class Meta:
         model = OPDBooking
         fields = ['booking_id', 'start_time', 'end_time', 'date', 'patient_id', 'slot_id', 'doctor_id', 'doctor_name', 'patient_name', 'hospital_id', 'is_booked']
+
+class WalkInSlotSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WalkInSlot
+        fields = '__all__'
+
+
