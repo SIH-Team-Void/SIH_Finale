@@ -1,168 +1,284 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import "../css/userLogin.css";
-import logoImage from '../img/icon2.png';
-import chatbotImage from '../img/chatbot_img.png';
+import logo from '../img/icon2.png';
+import chatbotImg from '../img/chatbot_img.png';
+import backgroundImg from '../img/background_img.png';
 
-export default function UserLogin() {
+const Login = () => {
   const navigate = useNavigate();
-  const [isLogin, setIsLogin] = useState(true); // Toggle between login and registration
+  const chatbotRef = useRef(null);
+  
+  const [activeTab, setActiveTab] = useState('login');
   const [showChatbot, setShowChatbot] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  
   const [formData, setFormData] = useState({
-    username: '',
-    password: '',
-    email: '',
+    name: '',
     phone_no: '',
-    role: 'patient',
+    email: '',
+    password: ''
   });
 
-  const handleChatbotToggle = () => setShowChatbot(!showChatbot);
+  const [userInput, setUserInput] = useState('');
+  const [messages, setMessages] = useState([]);
 
+  // Handle input changes and log each change for debugging
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    console.log(`Input Change: ${name} = ${value}`);  // Debugging statement
+    setFormData(prevState => ({
+      ...prevState,
+      [name]: value
+    }));
   };
 
-  const handleFormSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const endpoint = isLogin
-      ? 'http://localhost:8000/api/users/login/'
-      : 'http://localhost:8000/api/users/register/';
-
-    // For login, send phone_no and password
-    const loginData = isLogin
-      ? { phone_no: formData.phone_no, password: formData.password }
-      : formData;
-
-    console.log("Form Data:", loginData);  // Debugging: Log the data being sent
-
+  
+    const endpoint = activeTab === 'signup' 
+      ? 'http://localhost:8000/api/users/register/' 
+      : 'http://localhost:8000/api/users/login/';
+  
     try {
-      console.log(`Sending request to: ${endpoint}`);  // Debugging: Log the endpoint being hit
-      const response = await axios.post(endpoint, loginData);
-      console.log("Response Data:", response.data);  // Debugging: Log the response from the server
+      const response = await axios.post(endpoint, {
+        phone_no: formData.phone_no,
+        password: formData.password,
+        ...(activeTab === 'signup' && { 
+          name: formData.name,
+          email: formData.email
+        })
+      });
 
-      console.log(`${isLogin ? 'User logged in' : 'User registered'}:`, response.data);
-
-      if (isLogin) {
-        const userData = response.data;
-        console.log(userData)
-        
-        localStorage.setItem('userData', JSON.stringify(userData));
-        console.log(localStorage);
-        localStorage.setItem('userMobile', formData.phone_no);
+      console.log('Response data:', response.data);
+    
+  
+      if (activeTab === 'login') {
+        localStorage.setItem('userData', JSON.stringify(response.data));
+        localStorage.setItem('username', response.data.username);
+        localStorage.setItem('phone_no', response.data.phone_no);
+        localStorage.setItem('email', response.data.email);
+  
+        // Log user details to the console (for debugging purposes)
+        console.log('User logged in:', {
+          username: response.data.username,
+          phone_no: response.data.phone_no,
+          email: response.data.email
+        });
+  
+        // Navigate to Home page
         navigate('/user/Home');
       } else {
-        // Handle registration success
-        alert('Registration successful! Please log in.');
-        setIsLogin(true); // Switch to login view
+        alert('Registration successful! Please login.');
+        setActiveTab('login');
       }
     } catch (error) {
-      // Debugging: Log the error details
-      console.error(`${isLogin ? 'Login' : 'Registration'} error:`, error.response?.data || error.message);
-
-      if (error.response) {
-        console.error("Error Response Data:", error.response.data);  // Log full error response
-      }
-      
-      alert(`${isLogin ? 'Login' : 'Registration'} failed. Please try again.`);
+      console.error('Error during submission:', error);
+      alert(error.response?.data?.message || 'Something went wrong. Please try again.');
     }
+  };  
+  
+  const handleChatbotToggle = () => {
+    console.log('Chatbot toggle clicked');  // Debugging statement
+    setShowChatbot(!showChatbot);
+  };
+
+  const handleUserInput = async () => {
+    if (!userInput.trim()) return;
+
+    console.log('User input submitted to chatbot:', userInput);  // Debugging statement
+    const userMessage = { role: "user", content: userInput };
+    setMessages([...messages, userMessage]);
+
+    try {
+      const response = await axios.post('http://localhost:8000/chat', { content: userInput });
+      console.log('Chatbot response:', response.data);  // Debugging statement
+      
+      const botMessage = {
+        role: "bot",
+        content: response.data.response || "Sorry, I couldn't understand that. Can you rephrase?"
+      };
+      setMessages((prev) => [...prev, botMessage]);
+    } catch (error) {
+      console.error('Error fetching chatbot response:', error);
+      const errorMessage = {
+        role: "bot",
+        content: "Sorry, there was an issue connecting to the chatbot. Please try again later."
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+    }
+
+    setUserInput("");
+  };
+
+  // Dragging logic for the chatbot modal
+  const handleDragStart = (e) => {
+    setIsDragging(true);
+    const rect = chatbotRef.current.getBoundingClientRect();
+    setDragOffset({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    });
+
+    console.log('Chatbot drag started');  // Debugging statement
+  };
+
+  const handleDrag = (e) => {
+    if (!isDragging) return;
+    chatbotRef.current.style.left = `${e.clientX - dragOffset.x}px`;
+    chatbotRef.current.style.top = `${e.clientY - dragOffset.y}px`;
+  };
+
+  const handleDragEnd = () => {
+    setIsDragging(false);
+    console.log('Chatbot drag ended');  // Debugging statement
   };
 
   return (
-    <div className="userLog-body">
-      <div className="userLog-main-container">
-        <div className="userLog-left-container">
-          <img src={logoImage} alt="logo" />
-          <div className="userLog-tabs">
-            <div className="userLog-tab1">BED AVAILABILITY</div>
-            <div className="userLog-tab2">OPD APPOINTMENTS</div>
-            <div className="userLog-tab3">MEDICINES</div>
-          </div>
-          <p className="userLog-tagline">
-            A one stop solution for all your <b>Health Related</b> Problems.
-          </p>
-          <p>आप सभी के लिए एक वन स्टॉप समाधान <b>स्वास्थ्य संबंधित</b> समस्याएँ</p>
-          <button onClick={handleChatbotToggle}>
-            <img src={chatbotImage} alt="chatbot_img" />
-            <div className="userLog-chatbot">AI CHAT-BOT ASSISTANCE</div>
-          </button>
+    <div className="main-container" style={{ backgroundImage: `url(${backgroundImg})` }}>
+      <div className="left-container">
+        <img src={logo} alt="logo" />
+        <div className="tabs">
+          <div className="tab1">BED AVAILABILITY</div>
+          <div className="tab2">OPD APPOINTMENTS</div>
+          <div className="tab3">MEDICINES</div>
         </div>
-        <div className="userLog-right-container">
-          <div className="userLog-options">
-            <button
-              className={`userLog-activity ${isLogin ? 'active' : ''}`}
-              onClick={() => setIsLogin(true)}
+        <p className="tagline">A one stop solution for all your <b>Health Related</b> Problems.</p>
+        <p>आप सभी के लिए एक वन स्टॉप समाधान <b>स्वास्थ्य संबंधित</b> समस्याएँ</p>
+        <button onClick={handleChatbotToggle}>
+          <img src={chatbotImg} alt="chatbot_img" /> 
+          <div className="chatbot">AI CHAT-BOT ASSISTANCE</div>
+        </button>
+      </div>
+      <div className="right-container">
+        {activeTab === 'signup' && <p id="reg-log"><b>REGISTER</b> TO GET STARTED</p>}
+        {activeTab === 'login' && <p id="reg-log"><b>Login</b> TO GET STARTED</p>}
+        
+        <div className="form-container">
+          <div className="options">
+            <button 
+              className={`activity ${activeTab === 'login' ? 'active' : ''}`} 
+              onClick={() => setActiveTab('login')}
             >
               Log In
             </button>
-            <button
-              className={`userLog-activity ${!isLogin ? 'active' : ''}`}
-              onClick={() => setIsLogin(false)}
+            <button 
+              className={`activity ${activeTab === 'signup' ? 'active' : ''}`} 
+              onClick={() => setActiveTab('signup')}
             >
-              Register
+              Sign Up
             </button>
           </div>
-          <div className="userLog-form-container">
-            <form onSubmit={handleFormSubmit}>
-              {!isLogin && (
-                <div className="userLog-form-group">
-                  <label htmlFor="username">USERNAME</label>
-                  <input
-                    type="text"
-                    id="username"
-                    name="username"
+          
+          <div className="forminputs">
+            <form onSubmit={handleSubmit} method="POST">
+              {activeTab === 'signup' && (
+                <div className="form-group">
+                  <label htmlFor="name">NAME</label>
+                  <input 
+                    type="text" 
+                    id="name" 
+                    name="name" 
                     placeholder="Eg. Ashwin"
-                    value={formData.username}
+                    value={formData.name}
                     onChange={handleInputChange}
-                    required
                   />
                 </div>
               )}
-              <div className="userLog-form-group">
-                <label htmlFor="phone_no">Mobile No.</label>
-                <input
-                  type="tel"
-                  id="phone_no"
-                  name="phone_no"
-                  placeholder="Eg. 123 xxx xxxx"
+              <div className="form-group">
+                <label htmlFor="phone_no">Phone No.</label>
+                <input 
+                  type="text" 
+                  id="phone_no" 
+                  name="phone_no" 
+                  placeholder="Eg. 123 xxx xxxx" 
+                  required
                   value={formData.phone_no}
                   onChange={handleInputChange}
-                  required
                 />
               </div>
-              {!isLogin && (
-                <div className="userLog-form-group">
-                  <label htmlFor="email">Email</label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    placeholder="Eg. abc123@gmail.com"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                  />
-                </div>
+              {activeTab === 'signup' && (
+              <div className="form-group">
+                <label htmlFor="email">Email</label>
+                <input 
+                  type="email" 
+                  id="email" 
+                  name="email" 
+                  placeholder="Eg. abc123@gmail.com"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                />
+              </div>
               )}
-              <div className="userLog-form-group">
+              <div className="form-group">
                 <label htmlFor="password">Password</label>
-                <input
-                  type="password"
-                  id="password"
-                  name="password"
-                  placeholder="*** ***** ***"
+                <input 
+                  type="password" 
+                  id="password" 
+                  name="password" 
+                  placeholder="Eg. abc123@gmail.com" 
+                  required
                   value={formData.password}
                   onChange={handleInputChange}
-                  required
                 />
               </div>
-              <button className="userLog-register-btn" type="submit">
-                {isLogin ? 'LOGIN' : 'REGISTER'}
+              <button className="register-btn" type="submit">
+                {activeTab === 'signup' ? 'REGISTER' : 'LOGIN'}
               </button>
             </form>
           </div>
         </div>
       </div>
+      <div className="help">
+        <button>NEED HELP?</button>
+      </div>
+
+      {/* Chatbot Modal */}
+      {showChatbot && (
+        <div 
+          ref={chatbotRef}
+          className="chatbot-modal"
+          style={{ position: 'fixed' }}
+          onMouseDown={handleDragStart}
+          onMouseMove={handleDrag}
+          onMouseUp={handleDragEnd}
+          onMouseLeave={handleDragEnd}
+        >
+          <div className="chatbot-header">
+            <span>Swasth AI Chatbot </span>
+            <button className="botClose" onClick={handleChatbotToggle}>X</button>
+          </div>
+          <div className="chatbot-messages">
+            {messages.map((msg, index) => (
+              <div 
+                key={index} 
+                className={`${msg.role}-message`}
+              >
+                {msg.content}
+              </div>
+            ))}
+          </div>
+          <div className="chatbot-input">
+            <input 
+              type="text"
+              className="botInput"
+              value={userInput}
+              onChange={(e) => setUserInput(e.target.value)}
+              placeholder="Type your message..."
+            />
+            <button 
+              className="botSent"
+              onClick={handleUserInput}
+            >
+              Send
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
-}
+};
+
+export default Login;

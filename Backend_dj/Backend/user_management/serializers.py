@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from .models import User
+from django import forms
+
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     class Meta:
@@ -34,3 +36,4 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         
         instance.save()
         return instance
+    
