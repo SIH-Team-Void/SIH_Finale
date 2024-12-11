@@ -30,7 +30,7 @@ class Inventory(models.Model):
     Inv_price_per_item = models.DecimalField(max_digits=10, decimal_places=2, null=False, blank=False)
     Inv_total_price = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
     Inv_category =models.CharField(max_length=50, choices=CATEGORY_CHOICES, null=False, blank=False) # Optional, e.g., "surgical" or "medicines"
-    expiry_date= models.DateField(null=True,blank=True)
+    Inv_expiry_date= models.DateField(null=True,blank=True)
     Inv_vendor = models.CharField(max_length=50, null=True, blank=True)
     def __str__(self):
         return f"{self.Inv_name} - {self.Inv_quantity} - {self.Inv_price_per_item} items"

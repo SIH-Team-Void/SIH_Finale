@@ -120,10 +120,10 @@ export default function Login() {
           <p className="login-tagline">
             <b>Hospital Registration</b>
           </p>
-          <button>
+          {/* <button>
             <img src={chatbotImage} alt="chatbot_img" />
             <div className="login-chatbot"> AI CHAT-BOT ASSISTANCE </div>
-          </button>
+          </button> */}
         </div>
         <div className="login-right-container">
           <p className="login-line1">

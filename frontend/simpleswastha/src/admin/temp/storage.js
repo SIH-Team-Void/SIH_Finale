@@ -11,7 +11,7 @@ const Inventory = () => {
     Inv_price_per_item: 0,
     Inv_category: "",
     Inv_vendor: "",
-    expiry_date: "", // New field for expiry date
+    Inv_expiry_date: "", // New field for expiry date
   });
   const [editId, setEditId] = useState(null);
 
@@ -66,7 +66,7 @@ const Inventory = () => {
           Inv_price_per_item: 0,
           Inv_category: "",
           Inv_vendor: "",
-          expiry_date: "",
+          Inv_expiry_date: "",
         });
         setEditId(null);
       } else {
@@ -101,7 +101,7 @@ const Inventory = () => {
       Inv_price_per_item: item.Inv_price_per_item,
       Inv_category: item.Inv_category,
       Inv_vendor: item.Inv_vendor,
-      expiry_date: item.expiry_date,
+      Inv_expiry_date: item.Inv_expiry_date,
     });
     setEditId(item.Inv_id);
   };
@@ -111,10 +111,10 @@ const Inventory = () => {
     return new Date(expiryDate) < new Date();
   };
 
-  const expiredItems = inventory.filter((item) => isExpired(item.expiry_date));
+  const expiredItems = inventory.filter((item) => isExpired(item.Inv_expiry_date));
   const lowStockItems = inventory.filter((item) => item.Inv_quantity < 10);
   const normalItems = inventory.filter(
-    (item) => !isExpired(item.expiry_date) && item.Inv_quantity >= 10
+    (item) => !isExpired(item.Inv_expiry_date) && item.Inv_quantity >= 10
   );
 
   // Render inventory table
@@ -145,7 +145,7 @@ const Inventory = () => {
               <td>{item.Inv_quantity * item.Inv_price_per_item}</td>
               <td>{item.Inv_category}</td>
               <td>{item.Inv_vendor}</td>
-              <td>{new Date(item.expiry_date).toLocaleDateString()}</td>
+              <td>{new Date(item.Inv_expiry_date).toLocaleDateString()}</td>
               <td className="storage-actions">
                 <button className="storage-update-btn" onClick={() => handleEdit(item)}>
                   Edit Details
@@ -244,11 +244,11 @@ const Inventory = () => {
               />
             </div>
             <div className="storage-form-group">
-              <label htmlFor="expiry_date">Expiry Date</label>
+              <label htmlFor="Inv_expiry_date">Expiry Date</label>
               <input
                 type="date"
-                name="expiry_date"
-                value={formData.expiry_date}
+                name="Inv_expiry_date"
+                value={formData.Inv_expiry_date}
                 onChange={handleChange}
                 required
               />
