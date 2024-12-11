@@ -34,7 +34,7 @@ export default function OpdDr() {
           <div className="opdDr-search">
             <img src={searchIcon} alt="search" />
             <div className="opdDr-search-bar">
-              <input type="text" placeholder="Search By Hospital's Name" />
+              <input type="text" placeholder="Search By Doctor's Name" />
             </div>
           </div>
           <div className="opdDr-Dr-list">

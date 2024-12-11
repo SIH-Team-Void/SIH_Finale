@@ -247,7 +247,7 @@ const Login = () => {
           onMouseLeave={handleDragEnd}
         >
           <div className="chatbot-header">
-            <span>AI Chatbot</span>
+            <span>Swasth AI Chatbot </span>
             <button className="botClose" onClick={handleChatbotToggle}>X</button>
           </div>
           <div className="chatbot-messages">

@@ -24,5 +24,6 @@ urlpatterns = [
     path('api/', include('govschemes.urls')),
     path('api/', include('user_management.urls')),
     path('api/', include('api.urls')),
+    path('api/', include('inventory.urls')),
     path('bed_management/', include('bed_management.urls')),
 ]

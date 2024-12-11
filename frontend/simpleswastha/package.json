@@ -8,6 +8,7 @@
         "@testing-library/user-event": "^13.5.0",
         "axios": "^1.7.8",
         "leaflet": "^1.9.4",
+        "leaflet-draw": "^1.0.4",
         "react": "^18.3.1",
         "react-datepicker": "^7.5.0",
         "react-dom": "^18.3.1",
@@ -17,7 +18,11 @@
         "web-vitals": "^2.1.4"
     },
     "scripts": {
+<<<<<<< HEAD
+        "start": "cross-env WATCHPACK_POLLING=true react-scripts start",
+=======
         "start": "set WATCHPACK_POLLING=true && react-scripts start",
+>>>>>>> 66c23be14202ae5decbd6c52dedf704ac7e8b5ee
         "build": "react-scripts build",
         "test": "react-scripts test",
         "eject": "react-scripts eject"
@@ -39,5 +44,8 @@
             "last 1 firefox version",
             "last 1 safari version"
         ]
+    },
+    "devDependencies": {
+        "cross-env": "^7.0.3"
     }
 }
