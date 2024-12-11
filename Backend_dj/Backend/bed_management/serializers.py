@@ -34,6 +34,7 @@
 
 from rest_framework import serializers
 from .models import Ward, Bed, BedBooking, PatientAdmission, PatientDischarge, DeathRecord
+from datetime import timezone, timedelta
 
 class BedSerializer(serializers.ModelSerializer):
     class Meta:
@@ -86,8 +87,24 @@ class PatientAdmissionSerializer(serializers.ModelSerializer):
         model = PatientAdmission
         fields = ['id', 'patient_id', 'patient_name', 'doctor_name', 'ward', 
                  'ward_name', 'bed', 'bed_id', 'hospital', 'admission_date', 
-                 'admission_letter', 'created_at', 'status']
+                 'admission_letter', 'created_at', 'status', 'occupation_hours',
+                 'release_time']
         read_only_fields = ['id', 'patient_id', 'created_at', 'status']
+    
+    def get_remaining_time(self, obj):
+        """Calculate remaining time for the admission"""
+        if not obj.release_time:
+            return None
+            
+        now = timezone.now()
+        if now >= obj.release_time:
+            return "0h 0m"
+            
+        time_diff = obj.release_time - now
+        hours = int(time_diff.total_seconds() // 3600)
+        minutes = int((time_diff.total_seconds() % 3600) // 60)
+        
+        return f"{hours}h {minutes}m"
 
 
 class PatientDischargeSerializer(serializers.ModelSerializer):

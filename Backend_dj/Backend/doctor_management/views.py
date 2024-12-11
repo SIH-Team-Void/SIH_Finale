@@ -13,7 +13,8 @@ from rest_framework.decorators import api_view
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.decorators import action
 import json
-
+import stripe
+from django.conf import settings
 
 class DoctorViewSet(viewsets.ModelViewSet):
     queryset = Doctor.objects.all()
@@ -182,4 +183,80 @@ def walkin_list(request):
 
     serializer = WalkInSlotSerializer(walkins, many=True)
     return Response({'walkins': serializer.data}, status=status.HTTP_200_OK)
+
+
+stripe.api_key = settings.STRIPE_SECRET_KEY
+
+@api_view(['POST'])
+def create_checkout_session(request):
+    try:
+        booking_id = request.data.get('booking_id')
+        booking = OPDBooking.objects.get(pk=booking_id)
+        doctor = booking.doctor_id
+
+        checkout_session = stripe.checkout.Session.create(
+            payment_method_types=['card'],
+            line_items=[
+                {
+                    'price_data': {
+                        'currency': 'inr',
+                        'unit_amount': doctor.fees * 100,  # Convert to paise
+                        'product_data': {
+                            'name': f'Appointment with Dr. {doctor.doctor_name}',
+                            'description': f'Appointment on {booking.date} at {booking.start_time}',
+                        },
+                    },
+                    'quantity': 1,
+                },
+            ],
+            mode='payment',
+            success_url=settings.FRONTEND_SUCCESS_URL + f'?booking_id={booking_id}',
+            cancel_url=settings.FRONTEND_CANCEL_URL,
+            metadata={
+                'booking_id': booking_id,
+                'patient_name': request.data.get('patient_name'),
+            }
+        )
+        
+        return Response({
+            'checkout_url': checkout_session.url,
+            'session_id': checkout_session.id
+        })
+        
+    except Exception as e:
+        return Response(
+            {'error': str(e)}, 
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+@api_view(['POST'])
+def stripe_webhook(request):
+    stripe.api_key = settings.STRIPE_SECRET_KEY
+    endpoint_secret = 'your_stripe_webhook_secret'
+    
+    try:
+        event = stripe.Webhook.construct_event(
+            payload=request.body,
+            sig_header=request.META['HTTP_STRIPE_SIGNATURE'],
+            secret=endpoint_secret
+        )
+    except ValueError as e:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+    except stripe.error.SignatureVerificationError as e:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    if event['type'] == 'checkout.session.completed':
+        session = event['data']['object']
+        booking_id = session['metadata']['booking_id']
+        patient_name = session['metadata']['patient_name']
+
+        try:
+            booking = OPDBooking.objects.get(pk=booking_id)
+            booking.is_booked = True
+            booking.patient_name = patient_name
+            booking.save()
+        except OPDBooking.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+    return Response(status=status.HTTP_200_OK)
 

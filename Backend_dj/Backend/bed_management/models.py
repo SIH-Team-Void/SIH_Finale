@@ -1,6 +1,9 @@
 from django.db import models
 from django.core.exceptions import ValidationError
 from api.models import Hospital 
+from datetime import timedelta
+from django.utils import timezone
+
 
 class Ward(models.Model):
    STATUS_CHOICES = [
@@ -128,6 +131,8 @@ class PatientAdmission(models.Model):
     admission_letter = models.FileField(upload_to='admission_letters/')
     created_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=20, default='admitted')
+    occupation_hours = models.IntegerField(default=24)  # New field
+    release_time = models.DateTimeField(null=True, blank=True)
 
     def save(self, *args, **kwargs):
         if not self.patient_id:
@@ -142,11 +147,17 @@ class PatientAdmission(models.Model):
         if not self.pk:  # Only on creation
             self.bed.status = 'occupied'
             self.bed.save()
+            self.release_time = timezone.now() + timedelta(hours=self.occupation_hours)
             
         super().save(*args, **kwargs)
 
+def extend_time(self, additional_hours):
+        self.occupation_hours += additional_hours
+        self.release_time = self.release_time + timedelta(hours=additional_hours)
+        self.save()
+
 def __str__(self):
-    return f"{self.patient_id} - {self.patient_name}"
+        return f"{self.patient_id} - {self.patient_name}"
 
 class PatientDischarge(models.Model):
     discharge_id = models.AutoField(primary_key=True)

@@ -1,6 +1,6 @@
 # urls.py
 from django.urls import path
-from .views import WardAddView, WardListView, BedStatusUpdateView, BedBookingView , WardBedDeleteView, PatientAdmissionView, PatientDischargeView, DeathRecordView
+from .views import WardAddView, WardListView, BedStatusUpdateView, BedBookingView , WardBedDeleteView, PatientAdmissionView, PatientDischargeView, DeathRecordView, ExtendTimeView
 
 from . import views
 
@@ -20,6 +20,7 @@ urlpatterns = [
     path('patient-admission/<int:hosp_id>/', PatientAdmissionView.as_view(), name='patient-admission'),
     path('discharge/<int:hosp_id>/', PatientDischargeView.as_view(), name='patient-discharge'),
     path('death-record/<int:hosp_id>/', DeathRecordView.as_view(), name='death-record'),
+    path('extend-time/<int:hosp_id>/', ExtendTimeView.as_view(), name='extend-time'),
     
     # path('bed_management/ward/update/<int:hosp_id>/', BedUpdateView.as_view(), name='ward-update'),
 ]

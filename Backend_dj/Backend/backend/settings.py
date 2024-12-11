@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+from decouple import config
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -42,7 +43,7 @@ INSTALLED_APPS = [
     'user_management',
     'bed_management',
     'doctor_management.apps.DoctorConfig',
-    'inventory',
+    'inventory_management',
     'rest_framework',
     'corsheaders',
     'api',
@@ -175,3 +176,8 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+STRIPE_PUBLISHABLE_KEY = config('STRIPE_PUBLISHABLE_KEY')
+STRIPE_SECRET_KEY = config('STRIPE_SECRET_KEY')
+FRONTEND_SUCCESS_URL = 'http://localhost:3000/success'
+FRONTEND_CANCEL_URL = 'http://localhost:3000/cancel'
