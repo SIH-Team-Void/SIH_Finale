@@ -37,6 +37,7 @@ export default function goveSc() {
               <thead>
                 <tr>
                   <th>Date</th>
+                  <th>Hospital</th>
                   <th>Doctor</th>
                   <th>Start Time</th>
                   <th>End Time</th>
@@ -47,6 +48,7 @@ export default function goveSc() {
               </thead>
               <tbody>
                   <tr>
+                    <td></td>
                     <td></td>
                     <td></td>
                     <td></td>
