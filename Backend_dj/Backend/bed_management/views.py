@@ -15,6 +15,8 @@ from django.db import transaction, IntegrityError
 from rest_framework import status
 from django.db.models import Max, F
 from django.core.exceptions import ValidationError
+from django.utils import timezone
+from datetime import timedelta
 # class WardAddView(APIView):
 #     def post(self, request, hosp_id):  # Changed from hosp_ID 
 #         try:
@@ -269,6 +271,31 @@ def update_bed_status(request):
                 return JsonResponse({'error': 'Bed not found'}, status=404)
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    if request.method == 'GET':
+        bed_id = request.GET.get('bed_id')
+
+        if bed_id:
+            try:
+                bed = Bed.objects.get(id=bed_id)
+                return JsonResponse({
+                    'bed_id': bed.id,
+                    'status': bed.status,
+                    'ward': bed.ward.name,
+                    'hospital_id': bed.ward.hospital_id
+                }, status=200)
+            except Bed.DoesNotExist:
+                return JsonResponse({'error': 'Bed not found'}, status=404)
+        else:
+            beds = Bed.objects.all()
+            bed_list = [
+                {
+                    'bed_id': bed.id,
+                    'status': bed.status,
+                    'ward': bed.ward.name,
+                    'hospital_id': bed.ward.hospital_id
+                } for bed in beds
+            ]
+            return JsonResponse(bed_list, safe=False, status=200)
 
     return JsonResponse({'error': 'Invalid HTTP method'}, status=405)
 
@@ -508,11 +535,151 @@ class BedBookingView(APIView):
         return Response({'error': 'Hospital ID or Booking ID required'}, status=400)
 
 
+# class PatientAdmissionView(APIView):
+#     def post(self, request, hosp_id):
+#         try:
+#             ward_id = request.data.get('ward_id')
+#             bed_id = request.data.get('bed_id')
+            
+#             ward = get_object_or_404(Ward, id=ward_id, hospital_id=hosp_id)
+#             bed = get_object_or_404(Bed, id=bed_id, ward=ward)
+            
+#             if bed.status != 'vacant':
+#                 return Response(
+#                     {'error': 'Selected bed is not available'},
+#                     status=status.HTTP_400_BAD_REQUEST
+#                 )
+
+#             admission_letter = request.FILES.get('admission_letter')
+            
+#             admission_data = {
+#                 'patient_name': request.data.get('patient_name'),
+#                 'doctor_name': request.data.get('doctor_name'),  # Changed from doctor_id
+#                 'ward': ward.id,
+#                 'bed': bed.id,
+#                 'hospital': hosp_id,
+#                 'admission_date': request.data.get('admission_date'),
+#                 'admission_letter': admission_letter
+#             }
+            
+#             serializer = PatientAdmissionSerializer(data=admission_data)
+#             if serializer.is_valid():
+#                 admission = serializer.save()
+#                 response_data = serializer.data
+#                 response_data['message'] = 'Patient admitted successfully'
+#                 return Response(
+#                     response_data,
+#                     status=status.HTTP_201_CREATED
+#                 )
+#             return Response(
+#                 serializer.errors,
+#                 status=status.HTTP_400_BAD_REQUEST
+#             )
+            
+#         except Exception as e:
+#             return Response(
+#                 {'error': str(e)},
+#                 status=status.HTTP_400_BAD_REQUEST
+#             )
+            
+#     def get(self, request, hosp_id):
+#         try:
+#             # Fetch all admissions for the hospital
+#             admissions = PatientAdmission.objects.filter(hospital=hosp_id)
+            
+#             if not admissions.exists():
+#                 return Response(
+#                     {'error': 'No admissions found for the specified hospital'},
+#                     status=status.HTTP_404_NOT_FOUND
+#                 )
+            
+#             admission_data = []
+#             for admission in admissions:
+#                 admission_data.append({
+#                     'admission_id': admission.id,
+#                     'patient_name': admission.patient_name,
+#                     'doctor_name': admission.doctor_name,
+#                     'ward_id': admission.ward.id,
+#                     'ward_name': admission.ward.ward_name,
+#                     'bed_id': admission.bed.id,
+#                     'admission_date': admission.admission_date,
+#                 })
+            
+#             return Response(
+#                 {
+#                     'hospital_id': hosp_id,
+#                     'admissions': admission_data,
+#                     'message': 'Data retrieved successfully'
+#                 },
+#                 status=status.HTTP_200_OK
+#             )
+            
+#         except Exception as e:
+#             return Response(
+#                 {'error': str(e)},
+#                 status=status.HTTP_400_BAD_REQUEST
+#             )
+
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from django.shortcuts import get_object_or_404
+from django.utils import timezone
+from datetime import timedelta
+
+class ExtendTimeView(APIView):
+    def post(self, request, hosp_id):
+        try:
+            bed_id = request.data.get('bed_id')
+            additional_hours = int(request.data.get('additional_hours'))
+            
+            if not all([bed_id, additional_hours]):
+                return Response(
+                    {'error': 'Missing required fields'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Get the latest admission for this bed
+            admission = PatientAdmission.objects.filter(
+                bed_id=bed_id,
+                hospital_id=hosp_id,
+                status='admitted'
+            ).latest('created_at')
+            
+            # Update occupation_hours and release_time
+            admission.occupation_hours += additional_hours
+            admission.release_time = admission.release_time + timedelta(hours=additional_hours)
+            admission.save()
+            
+            # Calculate remaining time
+            remaining_time = admission.release_time - timezone.now()
+            hours = max(0, int(remaining_time.total_seconds() // 3600))
+            minutes = max(0, int((remaining_time.total_seconds() % 3600) // 60))
+            
+            return Response({
+                'message': 'Time extended successfully',
+                'occupation_hours': admission.occupation_hours,
+                'remaining_time': f"{hours}h {minutes}m"
+            }, status=status.HTTP_200_OK)
+            
+        except PatientAdmission.DoesNotExist:
+            return Response(
+                {'error': 'No active admission found for this bed'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except Exception as e:
+            print(f"Error extending time: {e}")  # Add logging
+            return Response(
+                {'error': str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
 class PatientAdmissionView(APIView):
     def post(self, request, hosp_id):
         try:
             ward_id = request.data.get('ward_id')
             bed_id = request.data.get('bed_id')
+            occupation_hours = int(request.data.get('occupation_hours', 24))  # Default 24 hours
             
             ward = get_object_or_404(Ward, id=ward_id, hospital_id=hosp_id)
             bed = get_object_or_404(Bed, id=bed_id, ward=ward)
@@ -525,14 +692,19 @@ class PatientAdmissionView(APIView):
 
             admission_letter = request.FILES.get('admission_letter')
             
+            # Calculate release time
+            release_time = timezone.now() + timedelta(hours=occupation_hours)
+            
             admission_data = {
                 'patient_name': request.data.get('patient_name'),
-                'doctor_name': request.data.get('doctor_name'),  # Changed from doctor_id
+                'doctor_name': request.data.get('doctor_name'),
                 'ward': ward.id,
                 'bed': bed.id,
                 'hospital': hosp_id,
                 'admission_date': request.data.get('admission_date'),
-                'admission_letter': admission_letter
+                'admission_letter': admission_letter,
+                'occupation_hours': occupation_hours,
+                'release_time': release_time
             }
             
             serializer = PatientAdmissionSerializer(data=admission_data)
@@ -540,6 +712,7 @@ class PatientAdmissionView(APIView):
                 admission = serializer.save()
                 response_data = serializer.data
                 response_data['message'] = 'Patient admitted successfully'
+                response_data['remaining_time'] = f"{occupation_hours}h 0m"
                 return Response(
                     response_data,
                     status=status.HTTP_201_CREATED
@@ -550,6 +723,7 @@ class PatientAdmissionView(APIView):
             )
             
         except Exception as e:
+            print(f"Error in admission: {e}")  # Add logging
             return Response(
                 {'error': str(e)},
                 status=status.HTTP_400_BAD_REQUEST
@@ -557,8 +731,10 @@ class PatientAdmissionView(APIView):
             
     def get(self, request, hosp_id):
         try:
-            # Fetch all admissions for the hospital
-            admissions = PatientAdmission.objects.filter(hospital=hosp_id)
+            admissions = PatientAdmission.objects.filter(
+                hospital=hosp_id,
+                status='admitted'
+            ).select_related('ward', 'bed')
             
             if not admissions.exists():
                 return Response(
@@ -567,7 +743,19 @@ class PatientAdmissionView(APIView):
                 )
             
             admission_data = []
+            now = timezone.now()
+            
             for admission in admissions:
+                # Calculate remaining time
+                if admission.release_time:
+                    time_diff = admission.release_time - now
+                    total_seconds = max(0, time_diff.total_seconds())
+                    hours = int(total_seconds // 3600)
+                    minutes = int((total_seconds % 3600) // 60)
+                    remaining_time = f"{hours}h {minutes}m"
+                else:
+                    remaining_time = "0h 0m"
+                
                 admission_data.append({
                     'admission_id': admission.id,
                     'patient_name': admission.patient_name,
@@ -576,6 +764,8 @@ class PatientAdmissionView(APIView):
                     'ward_name': admission.ward.ward_name,
                     'bed_id': admission.bed.id,
                     'admission_date': admission.admission_date,
+                    'remaining_time': remaining_time,
+                    'occupation_hours': admission.occupation_hours
                 })
             
             return Response(
@@ -588,6 +778,7 @@ class PatientAdmissionView(APIView):
             )
             
         except Exception as e:
+            print(f"Error fetching admissions: {e}")  # Add logging
             return Response(
                 {'error': str(e)},
                 status=status.HTTP_400_BAD_REQUEST
@@ -774,6 +965,80 @@ class DeathRecordView(APIView):
                 'message': 'Death records retrieved successfully'
             }, status=status.HTTP_200_OK)
 
+        except Exception as e:
+            return Response(
+                {'error': str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+            
+            
+class ExtendTimeView(APIView):
+    def post(self, request, hosp_id):
+        try:
+            bed_id = request.data.get('bed_id')
+            additional_hours = int(request.data.get('additional_hours'))
+            
+            if not all([bed_id, additional_hours]):
+                return Response(
+                    {'error': 'Missing required fields'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Get the latest admission for this bed
+            admission = PatientAdmission.objects.filter(
+                bed_id=bed_id,
+                hospital_id=hosp_id,
+                status='admitted'
+            ).latest('created_at')
+            
+            # Update occupation_hours and release_time
+            admission.occupation_hours += additional_hours
+            admission.release_time = admission.release_time + timedelta(hours=additional_hours)
+            admission.save()
+            
+            # Return updated time information
+            remaining_time = admission.release_time - timezone.now()
+            hours = int(remaining_time.total_seconds() // 3600)
+            minutes = int((remaining_time.total_seconds() % 3600) // 60)
+            
+            return Response({
+                'message': 'Time extended successfully',
+                'occupation_hours': admission.occupation_hours,
+                'remaining_time': f"{hours}h {minutes}m"
+            }, status=status.HTTP_200_OK)
+            
+        except PatientAdmission.DoesNotExist:
+            return Response(
+                {'error': 'No active admission found for this bed'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except Exception as e:
+            return Response(
+                {'error': str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+    def get(self, request, hosp_id):
+        try:
+            # Fetch all admissions for the hospital
+            admissions = PatientAdmission.objects.filter(hospital=hosp_id)
+            
+            if not admissions.exists():
+                return Response(
+                    {'error': 'No admissions found for the specified hospital'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            
+            serializer = PatientAdmissionSerializer(admissions, many=True)
+            
+            return Response(
+                {
+                    'hospital_id': hosp_id,
+                    'admissions': serializer.data,
+                    'message': 'Data retrieved successfully'
+                },
+                status=status.HTTP_200_OK
+            )
+            
         except Exception as e:
             return Response(
                 {'error': str(e)},
