@@ -109,6 +109,8 @@ import GovernmentHome from './goverment/temp/goveHome';
 import GovernmentMap from './goverment/temp/goveMap';
 import GovernmentSc from './goverment/temp/goveSc';
 import UserBedCat from './user/temp/bedCat';
+import { SuccessPage, CancelPage } from './user/temp/opdDrSc';
+
 
 function App() {
   return (
@@ -145,6 +147,9 @@ function App() {
           <Route path="/user/userAccount" element={<UserAccount />} />
           <Route path="/user/govermentSc" element={<UserGoverSc />} />
           <Route path="/user/signup" element={<UserSignUp />} />
+          <Route path="/success" element={<SuccessPage />} />
+          <Route path="/cancel" element={<CancelPage />} />
+
           
           
           {/* Updated Bed Category Route with Hospital ID */}

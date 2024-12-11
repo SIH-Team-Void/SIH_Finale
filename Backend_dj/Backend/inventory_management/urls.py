@@ -1,4 +1,4 @@
-from inventory import views
+from inventory_management import views
 from django.urls import path
 from .views import VendorInventoryAPIView, SaleView, SaleItemView
 
