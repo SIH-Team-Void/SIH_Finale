@@ -22,6 +22,16 @@ class SalesSerializer(serializers.ModelSerializer):
         model = Sales
         fields = "__all__"
 
+class Inqr(serializers.ModelSerializer):
+    class Meta:
+        model = Inventory
+        fields = [
+            'Inv_id', 'Inv_name', 'Inv_quantity', 
+            'Inv_price_per_item', 'Inv_total_price', 
+            'Inv_category', 'Inv_subcategory', 
+            'batch_number', 'expiry_date', 'Inv_vendor'
+        ]
+
 class SalesItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = SalesItem

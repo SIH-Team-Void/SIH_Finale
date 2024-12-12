@@ -24,14 +24,36 @@ class Inventory(models.Model):
         ('surgical', 'Surgical'),
         ('medicines', 'Medicines'),
     ]
+    SUBCATEGORY_CHOICES = {
+        'surgical': [
+            ('red', 'Red'),
+            ('yellow', 'Yellow'),
+            ('blue', 'Blue'),
+            ('white', 'White'),
+            ('black', 'Black'),
+        ],
+        'medicines': [
+            ('antibiotics', 'Antibiotics'),
+            ('painkillers', 'Painkillers'),
+        ],
+    }
     Inv_id = models.AutoField(primary_key=True, editable=False)
     Inv_name = models.CharField(max_length=150, null=False, blank=False)
     Inv_quantity = models.PositiveIntegerField(null=False, blank=False)
     Inv_price_per_item = models.DecimalField(max_digits=10, decimal_places=2, null=False, blank=False)
     Inv_total_price = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
-    Inv_category =models.CharField(max_length=50, choices=CATEGORY_CHOICES, null=False, blank=False) # Optional, e.g., "surgical" or "medicines"
+    Inv_category =models.CharField(max_length=50, choices=CATEGORY_CHOICES, null=False, blank=False)
+    Inv_subcategory = models.CharField(max_length=50, null=True, blank=True)
+    batch_number = models.CharField(max_length=50, null=True, blank=True, unique=True) # Optional, e.g., "surgical" or "medicines"
     expiry_date= models.DateField(null=True,blank=True)
     Inv_vendor = models.CharField(max_length=50, null=True, blank=True)
+
+    def clean(self):
+        # Validate subcategory based on the selected category
+        if self.Inv_category and self.Inv_subcategory:
+            valid_subcategories = dict(self.SUBCATEGORY_CHOICES).get(self.Inv_category, [])
+            if not any(self.Inv_subcategory == sub[0] for sub in valid_subcategories):
+                raise ValidationError(f"Invalid subcategory '{self.Inv_subcategory}' for category '{self.Inv_category}'.")
     def _str_(self):
         return f"{self.Inv_name} - {self.Inv_quantity} - {self.Inv_price_per_item} items"
 

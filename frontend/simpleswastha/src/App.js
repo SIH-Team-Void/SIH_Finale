@@ -12,6 +12,7 @@ import Storage from './admin/temp/storage';
 import Sales from './admin/temp/sales';
 import WalkIn from './admin/temp/walkIn';
 import Vaim from './admin/temp/vaim';
+import Edit from './admin/temp/dispension';
 import DrSc from './admin/temp/drSc';
 // import BedList from './admin/temp/bedlist';
 import BedNoti from './admin/temp/bedNo';
@@ -52,6 +53,7 @@ function App() {
           <Route path="/admin/inventory/storage" element={<Storage />} />
           <Route path="/admin/inventory/sales" element={<Sales />} />
           <Route path="/admin/inventory/vaim" element={<Vaim />} />
+          <Route path="/admin/inventory/dispension" element={<Edit />} />
           {/* <Route path="/admin/bedlist" element={<BedList />} /> */}
           <Route path="/admin/walkIn" element={<WalkIn />} />
 

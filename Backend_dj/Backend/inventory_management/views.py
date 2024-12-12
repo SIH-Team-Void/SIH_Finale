@@ -2,9 +2,14 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework import status
+from django.http import JsonResponse
 from rest_framework import viewsets
+import cv2
+import numpy as np
+from .models import Inventory
+from .serializers import InventorySerializer
 from .models import Sales, Inventory, SalesItem, Vendors
-from .serializers import VendorSerializer, InventorySerializer, SalesSerializer,SalesItemSerializer
+from .serializers import VendorSerializer, InventorySerializer, SalesSerializer,SalesItemSerializer, Inqr
 
 
 #this is how to create a api for the page
@@ -135,3 +140,58 @@ class SaleItemView(APIView):
         sale_items = SalesItem.objects.all()  # Fetch all sale items from database
         sale_item_serializer = SalesItemSerializer(sale_items, many=True)  # Serialize the data
         return Response(sale_item_serializer.data, status=status.HTTP_200_OK)
+    
+class QRCodeScannerView(APIView):
+    def post(self, request):
+        # Receive image from frontend
+        image = request.FILES.get('image')
+        
+        if not image:
+            return Response({'error': 'No image uploaded'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Read image using OpenCV
+        nparr = np.frombuffer(image.read(), np.uint8)
+        img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+        
+        # Initialize QR Code detector
+        qr_detector = cv2.QRCodeDetector()
+        
+        # Detect and decode QR Code
+        data, bbox, _ = qr_detector.detectAndDecode(img)
+        
+        if not data:
+            return Response({'error': 'No QR Code detected'}, status=status.HTTP_404_NOT_FOUND)
+        
+        try:
+            # Assume QR code contains batch_number
+            inventory_item = Inventory.objects.get(batch_number=data)
+            
+            # Check if item is available
+            if inventory_item.Inv_quantity > 0:
+                # Deduct one item from inventory
+                inventory_item.Inv_quantity -= 1
+                inventory_item.save()
+                
+                # Serialize and return updated item
+                serializer = Inqr(inventory_item)
+                return Response({
+                    'message': 'Item deducted successfully', 
+                    'item': serializer.data
+                }, status=status.HTTP_200_OK)
+            else:
+                return Response({
+                    'error': 'Item out of stock'
+                }, status=status.HTTP_400_BAD_REQUEST)
+        
+        except Inventory.DoesNotExist:
+            return Response({
+                'error': 'No inventory item found with this batch number'
+            }, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({
+                'error': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+
+

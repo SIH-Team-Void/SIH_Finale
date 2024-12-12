@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'user_management',
     'bed_management',
     'doctor_management.apps.DoctorConfig',
-    'inventory',
+    'inventory_management',
     'rest_framework',
     'corsheaders',
     'api',
