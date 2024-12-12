@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import "../css/govermentSc.css";
-import Navbar from '../userComponents/userNavbar';
-import SearchIcon from '../img/search.png';
-import { Link } from 'react-router-dom';
+import Navbar from "../userComponents/userNavbar";
+import SearchIcon from "../img/search.png";
+import { Link } from "react-router-dom";
 
 const GovermentSc = () => {
   const [data, setData] = useState([]); // All fetched schemes
@@ -60,9 +60,15 @@ const GovermentSc = () => {
         (filters.userAge ? scheme.userAge === filters.userAge : true) &&
         (filters.income ? scheme.income === filters.income : true) &&
         (filters.gender ? scheme.gender === filters.gender : true) &&
-        (filters.familySize ? scheme.familySize === filters.familySize : true) &&
-        (filters.maritalStatus ? scheme.maritalStatus === filters.maritalStatus : true) &&
-        (filters.healthProblems ? scheme.healthProblems === filters.healthProblems : true) &&
+        (filters.familySize
+          ? scheme.familySize === filters.familySize
+          : true) &&
+        (filters.maritalStatus
+          ? scheme.maritalStatus === filters.maritalStatus
+          : true) &&
+        (filters.healthProblems
+          ? scheme.healthProblems === filters.healthProblems
+          : true) &&
         (filters.case ? scheme.case === filters.case : true)
       );
     });
@@ -91,46 +97,74 @@ const GovermentSc = () => {
             <div className="userGoveSc-form-row">
               <div className="userGoveSc-form-group">
                 <label htmlFor="state">Select State</label>
-                <select id="state" name="state" value={filters.userState} onChange={handleFilterChange}>
+                <select
+                  id="state"
+                  name="state"
+                  value={filters.userState}
+                  onChange={handleFilterChange}
+                >
                   <option value="">All</option>
-                  {[...new Set(data.map((item) => item.userState))].map((userState) => (
-                    <option key={userState} value={userState}>
-                      {userState}
-                    </option>
-                  ))}
+                  {[...new Set(data.map((item) => item.userState))].map(
+                    (userState) => (
+                      <option key={userState} value={userState}>
+                        {userState}
+                      </option>
+                    )
+                  )}
                 </select>
               </div>
               <div className="userGoveSc-form-group">
                 <label htmlFor="age">Select Age</label>
-                <select id="age" name="age" value={filters.userAge} onChange={handleFilterChange}>
+                <select
+                  id="age"
+                  name="age"
+                  value={filters.userAge}
+                  onChange={handleFilterChange}
+                >
                   <option value="">All</option>
-                  {[...new Set(data.map((item) => item.userAge))].map((userAge) => (
-                    <option key={userAge} value={userAge}>
-                      {userAge}
-                    </option>
-                  ))}
+                  {[...new Set(data.map((item) => item.userAge))].map(
+                    (userAge) => (
+                      <option key={userAge} value={userAge}>
+                        {userAge}
+                      </option>
+                    )
+                  )}
                 </select>
               </div>
               <div className="userGoveSc-form-group">
                 <label htmlFor="income">Income Group</label>
-                <select id="income" name="income" value={filters.income} onChange={handleFilterChange}>
+                <select
+                  id="income"
+                  name="income"
+                  value={filters.income}
+                  onChange={handleFilterChange}
+                >
                   <option value="">Select Income Group</option>
-                  {[...new Set(data.map((item) => item.income))].map((income) => (
-                    <option key={income} value={income}>
-                      {income}
-                    </option>
-                  ))}
+                  {[...new Set(data.map((item) => item.income))].map(
+                    (income) => (
+                      <option key={income} value={income}>
+                        {income}
+                      </option>
+                    )
+                  )}
                 </select>
               </div>
               <div className="userGoveSc-form-group">
                 <label htmlFor="gender">Gender</label>
-                <select id="gender" name="gender" value={filters.gender} onChange={handleFilterChange}>
+                <select
+                  id="gender"
+                  name="gender"
+                  value={filters.gender}
+                  onChange={handleFilterChange}
+                >
                   <option value="">All</option>
-                  {[...new Set(data.map((item) => item.gender))].map((gender) => (
-                    <option key={gender} value={gender}>
-                      {gender}
-                    </option>
-                  ))}
+                  {[...new Set(data.map((item) => item.gender))].map(
+                    (gender) => (
+                      <option key={gender} value={gender}>
+                        {gender}
+                      </option>
+                    )
+                  )}
                 </select>
               </div>
             </div>
@@ -138,48 +172,76 @@ const GovermentSc = () => {
             <div className="userGoveSc-form-row">
               <div className="userGoveSc-form-group">
                 <label htmlFor="familySize">Family Size</label>
-                <select id="familySize" name="familySize" value={filters.familySize} onChange={handleFilterChange}>
+                <select
+                  id="familySize"
+                  name="familySize"
+                  value={filters.familySize}
+                  onChange={handleFilterChange}
+                >
                   <option value="">All</option>
-                  {[...new Set(data.map((item) => item.familySize))].map((familySize) => (
-                    <option key={familySize} value={familySize}>
-                      {familySize}
-                    </option>
-                  ))}
+                  {[...new Set(data.map((item) => item.familySize))].map(
+                    (familySize) => (
+                      <option key={familySize} value={familySize}>
+                        {familySize}
+                      </option>
+                    )
+                  )}
                 </select>
               </div>
               <div className="userGoveSc-form-group">
                 <label htmlFor="maritalStatus">Marital Status</label>
-                <select id="maritalStatus" name="maritalStatus" value={filters.maritalStatus} onChange={handleFilterChange}>
+                <select
+                  id="maritalStatus"
+                  name="maritalStatus"
+                  value={filters.maritalStatus}
+                  onChange={handleFilterChange}
+                >
                   <option value="">All</option>
-                  {[...new Set(data.map((item) => item.maritalStatus))].map((maritalStatus) => (
-                    <option key={maritalStatus} value={maritalStatus}>
-                      {maritalStatus}
-                    </option>
-                  ))}
+                  {[...new Set(data.map((item) => item.maritalStatus))].map(
+                    (maritalStatus) => (
+                      <option key={maritalStatus} value={maritalStatus}>
+                        {maritalStatus}
+                      </option>
+                    )
+                  )}
                 </select>
               </div>
               <div className="userGoveSc-form-group">
                 <label htmlFor="healthProblems">Health Problems</label>
-                <select id="healthProblems" name="healthProblems" value={filters.healthProblems} onChange={handleFilterChange}>
+                <select
+                  id="healthProblems"
+                  name="healthProblems"
+                  value={filters.healthProblems}
+                  onChange={handleFilterChange}
+                >
                   <option value="">All</option>
-                  {[...new Set(data.map((item) => item.healthProblems))].map((healthProblem) => (
-                    <option key={healthProblem} value={healthProblem}>
-                      {healthProblem}
-                    </option>
-                  ))}
+                  {[...new Set(data.map((item) => item.healthProblems))].map(
+                    (healthProblem) => (
+                      <option key={healthProblem} value={healthProblem}>
+                        {healthProblem}
+                      </option>
+                    )
+                  )}
                 </select>
               </div>
             </div>
 
             <div className="userGoveSc-form-group">
               <label htmlFor="case">Case</label>
-              <select id="case" name="case" value={filters.caste} onChange={handleFilterChange}>
+              <select
+                id="case"
+                name="case"
+                value={filters.caste}
+                onChange={handleFilterChange}
+              >
                 <option value="">All</option>
-                {[...new Set(data.map((item) => item.caste))].map((caseItem) => (
-                  <option key={caseItem} value={caseItem}>
-                    {caseItem}
-                  </option>
-                ))}
+                {[...new Set(data.map((item) => item.caste))].map(
+                  (caseItem) => (
+                    <option key={caseItem} value={caseItem}>
+                      {caseItem}
+                    </option>
+                  )
+                )}
               </select>
             </div>
           </form>
@@ -191,15 +253,21 @@ const GovermentSc = () => {
         <div className="userGoveSc-lowerSection">
           <div className="userGoveSc-search">
             <img src={SearchIcon} alt="searchIcon" />
-            <input className="userGoveSc-searchBox" placeholder="Search for schemes" />
+            <input
+              className="userGoveSc-searchBox"
+              placeholder="Search for schemes"
+            />
           </div>
 
           <div className="userGoveSc-cardSection">
             {filteredData.map((scheme) => (
               <div key={scheme.id} className="userGoveSc-card">
                 <h4>{scheme.schemeName}</h4>
-                <p>{scheme.schemeDescription.substring(0, 100)}...</p>
-                <button className="userGoveSc-register-btn" onClick={() => openModal(scheme)}>
+                <samp>{scheme.schemeDescription.substring(0, 100)}...</samp>
+                <button
+                  className="userGoveSc-register-btn"
+                  onClick={() => openModal(scheme)}
+                >
                   View
                 </button>
               </div>
@@ -213,22 +281,44 @@ const GovermentSc = () => {
           <div className="modal-content">
             <h2>{selectedScheme.schemeName}</h2>
             <p>{selectedScheme.schemeDescription}</p>
-            <ul>
-              <li><strong>State:</strong> {selectedScheme.userState}</li>
-              <li><strong>Age:</strong> {selectedScheme.userAge}</li>
-              <li><strong>Income Group:</strong> {selectedScheme.income}</li>
-              <li><strong>Gender:</strong> {selectedScheme.gender}</li>
-              <li><strong>Family Size:</strong> {selectedScheme.familySize}</li>
-              <li><strong>Marital Status:</strong> {selectedScheme.maritalStatus}</li>
-              <li><strong>Health Problems:</strong> {selectedScheme.healthProblems}</li>
-              <li><strong>Case:</strong> {selectedScheme.caste}</li>
-            </ul>
-            <a href={selectedScheme.schemeUrl} target="_blank" rel="noopener noreferrer" className="read-more-btn">
+            <span>
+              <strong>State:</strong> {selectedScheme.userState}
+            </span>
+            <span>
+              <strong>Age:</strong> {selectedScheme.userAge}
+            </span>
+            <span>
+              <strong>Income Group:</strong> {selectedScheme.income}
+            </span>
+            <span>
+              <strong>Gender:</strong> {selectedScheme.gender}
+            </span>
+            <span>
+              <strong>Family Size:</strong> {selectedScheme.familySize}
+            </span>
+            <span>
+              <strong>Marital Status:</strong> {selectedScheme.maritalStatus}
+            </span>
+            <br />
+            <span>
+              <strong>Health Problems:</strong> {selectedScheme.healthProblems}
+            </span>
+            <span>
+              <strong>Case:</strong> {selectedScheme.caste}
+            </span>{" "}
+            <br />
+            <br />
+            <a
+              href={selectedScheme.schemeUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="read-more-btn"
+            >
               Read More
             </a>
-            <button className="modal-close-btn" onClick={closeModal}>
-              Close
-            </button>
+            <p className="govScmodal-close-btn" onClick={closeModal}>
+              X
+            </p>
           </div>
         </div>
       )}

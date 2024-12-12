@@ -110,7 +110,7 @@ import GovernmentMap from './goverment/temp/goveMap';
 import GovernmentSc from './goverment/temp/goveSc';
 import UserBedCat from './user/temp/bedCat';
 import { SuccessPage, CancelPage } from './user/temp/opdDrSc';
-
+import QueuePredictor from './admin/temp/queuepredict';
 
 function App() {
   return (
@@ -136,6 +136,7 @@ function App() {
           <Route path="/admin/inventory/vaim" element={<Vaim />} />
           <Route path="/admin/bedlist" element={<BedList />} />
           <Route path="/admin/walkIn" element={<WalkIn />} />
+          <Route path='/admin/queuepredict' element={<QueuePredictor />} />
 
           {/* User Portal */}
           <Route path="/user" element={<UserLogin />} />

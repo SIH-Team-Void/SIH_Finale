@@ -3,6 +3,11 @@ from datetime import datetime, timedelta, date
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from user_management.models import User
+from django.db import models
+from datetime import datetime
+import numpy as np
+import joblib
+from pathlib import Path
 
 
 class Doctor(models.Model):
@@ -139,4 +144,118 @@ class DoctorTokenTracker(models.Model):
 
     def __str__(self):
         return f"Dr. {self.doctor.doctor_name} - Current Token: {self.current_token}"
+    
+
+class Payment(models.Model):
+    booking = models.OneToOneField(OPDBooking, on_delete=models.CASCADE)
+    stripe_payment_id = models.CharField(max_length=100)
+    amount = models.IntegerField()
+    status = models.CharField(max_length=20, default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+    refunded = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Payment {self.stripe_payment_id} for booking {self.booking_id}"
+    
+
+
+class PatientSymptom(models.Model):
+    name = models.CharField(max_length=100)
+    severity_choices = [
+        ('Mild', 'Mild'),
+        ('Moderate', 'Moderate'),
+        ('Severe', 'Severe')
+    ]
+    severity = models.CharField(max_length=10, choices=severity_choices)
+    
+    def __str__(self):
+        return f"{self.name} - {self.severity}"
+
+class ConsultationRecord(models.Model):
+    patient_name = models.CharField(max_length=255)
+    age = models.IntegerField()
+    gender = models.CharField(max_length=1, choices=[('M', 'Male'), ('F', 'Female')])
+    primary_symptom = models.ForeignKey(PatientSymptom, on_delete=models.CASCADE)
+    previous_visits = models.IntegerField(default=0)
+    is_emergency = models.BooleanField(default=False)
+    consultation_time = models.IntegerField()  # Actual time taken in minutes
+    doctor = models.ForeignKey('Doctor', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.patient_name} - {self.primary_symptom}"
+
+class QueuePrediction(models.Model):
+    patient_name = models.CharField(max_length=255)
+    predicted_time = models.IntegerField()  # in minutes
+    doctor = models.ForeignKey('Doctor', on_delete=models.CASCADE)
+    symptoms = models.ManyToManyField(PatientSymptom)
+    token_number = models.IntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    actual_time = models.IntegerField(null=True, blank=True)  # Filled after consultation
+    
+    def __str__(self):
+        return f"{self.patient_name} - Token {self.token_number}"
+
+# ML Model Manager
+class ConsultationPredictor:
+    def __init__(self):
+        self.model = None
+        self.load_model()
+    
+    def load_model(self):
+        try:
+            model_path = Path(__file__).parent / 'ml_models' / 'consultation_predictor.joblib'
+            self.model = joblib.load(model_path)
+        except:
+            # If model doesn't exist, we'll use a simple heuristic
+            self.model = None
+    
+    def predict_time(self, patient_data):
+        """
+        Predict consultation time based on patient data
+        Returns predicted time in minutes
+        """
+        if self.model:
+            # Use the trained model for prediction
+            features = self._prepare_features(patient_data)
+            return int(self.model.predict([features])[0])
+        else:
+            # Fallback to heuristic prediction
+            return self._heuristic_prediction(patient_data)
+    
+    def _prepare_features(self, data):
+        """Prepare features for ML model prediction"""
+        severity_map = {'Mild': 0, 'Moderate': 1, 'Severe': 2}
+        return [
+            data['age'],
+            1 if data['gender'] == 'M' else 0,
+            severity_map[data['symptom_severity']],
+            data['previous_visits'],
+            data.get('is_emergency', 0),
+            datetime.now().hour,  # time of day
+            datetime.now().weekday()  # day of week
+        ]
+    
+    def _heuristic_prediction(self, data):
+        """Simple heuristic-based prediction when model is not available"""
+        base_time = 15  # Base consultation time
+        
+        # Add time based on severity
+        severity_time = {
+            'Mild': 0,
+            'Moderate': 5,
+            'Severe': 10
+        }
+        
+        total_time = base_time + severity_time[data['symptom_severity']]
+        
+        # Adjust for emergency
+        if data.get('is_emergency', False):
+            total_time += 10
+            
+        # Add some random variation
+        total_time += np.random.randint(-3, 4)
+        
+        return max(total_time, 10)  # Minimum 10 minutes
 

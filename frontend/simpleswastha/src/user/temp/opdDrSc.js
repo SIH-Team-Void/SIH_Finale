@@ -43,80 +43,7 @@ export default function OpdDrSc() {
     return dates;
   };
 
-  const fetchAvailableSlots = async (doctorId, date) => {
-    try {
-      // Adjust the date to local timezone
-      const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
-        .toISOString()
-        .split('T')[0];
-
-      console.log("Fetching slots for doctorId:", doctorId, "and date:", localDate);
-
-      const response = await fetch(`http://localhost:8000/api/bookings/?doctor_id=${doctorId}&date=${localDate}`);
-      console.log("API endpoint:", `http://localhost:8000/api/bookings/?doctor_id=${doctorId}&date=${localDate}`);
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log("Fetched Data:", data);
-        setAvailableSlots(Array.isArray(data) ? data : []);
-      } else {
-        console.error("Error: API response not ok");
-        setAvailableSlots([]);
-      }
-    } catch (error) {
-      console.error("Error fetching available slots:", error);
-      setAvailableSlots([]);
-    }
-  };
-
   const dateList = generateDates(startDate);
-
-  const handleBooking = async () => {
-    const patientName = localStorage.getItem("username");
-    
-    if (!patientName) {
-      alert("Please log in or register to book an appointment.");
-      return;
-    }
-
-    if (!selectedSlot) {
-      alert("Please select a time slot.");
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      // Create Stripe checkout session
-      const response = await fetch('http://localhost:8000/api/create-checkout-session/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          booking_id: selectedSlot.booking_id,
-          patient_name: patientName,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to create checkout session');
-      }
-
-      const { checkout_url } = await response.json();
-      
-      // Redirect to Stripe Checkout
-      window.location.href = checkout_url;
-
-    } catch (error) {
-      console.error('Error creating checkout session:', error);
-      alert('Failed to process payment. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  
 
   const handleDateClick = (dateObj) => {
     console.log("Date clicked:", dateObj.date);
@@ -144,27 +71,110 @@ export default function OpdDrSc() {
     setStartDate(newStartDate);
   };
 
-  const handleProceedToPayment = async () => {
+  const verifyBookingStatus = async (bookingId) => {
+    try {
+      const response = await fetch(`http://localhost:8000/api/verify-booking-status/${bookingId}/`);
+      if (response.ok) {
+        const data = await response.json();
+        setBookingStatus(prev => ({
+          ...prev,
+          [bookingId]: data
+        }));
+        
+        // Update available slots if booking status changed
+        if (data.is_booked) {
+          setAvailableSlots(prevSlots =>
+            prevSlots.map(slot =>
+              slot.booking_id === bookingId
+                ? { ...slot, is_booked: true }
+                : slot
+            )
+          );
+        }
+      }
+    } catch (error) {
+      console.error('Error verifying booking status:', error);
+    }
+  };
+
+  // Modify fetchAvailableSlots to also fetch booking status
+  const fetchAvailableSlots = async (doctorId, date) => {
+    try {
+      const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+        .toISOString()
+        .split('T')[0];
+
+      const response = await fetch(`http://localhost:8000/api/bookings/?doctor_id=${doctorId}&date=${localDate}`);
+
+      if (response.ok) {
+        const data = await response.json();
+        const slots = Array.isArray(data) ? data : [];
+        setAvailableSlots(slots);
+
+        // Fetch status for all slots
+        slots.forEach(slot => {
+          verifyBookingStatus(slot.booking_id);
+        });
+      } else {
+        setAvailableSlots([]);
+      }
+    } catch (error) {
+      console.error("Error fetching available slots:", error);
+      setAvailableSlots([]);
+    }
+  };
+
+  // Add refund functionality
+  const handleRefund = async (bookingId) => {
+    if (!window.confirm('Are you sure you want to cancel this appointment and request a refund?')) {
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:8000/api/refund-payment/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          booking_id: bookingId,
+        }),
+      });
+
+      if (response.ok) {
+        alert('Refund processed successfully');
+        // Refresh the slots
+        fetchAvailableSlots(doctor.doctor_id, selectedDate);
+      } else {
+        const data = await response.json();
+        alert(`Refund failed: ${data.error}`);
+      }
+    } catch (error) {
+      console.error('Error processing refund:', error);
+      alert('Failed to process refund. Please try again.');
+    }
+  };
+
+  // Update the booking process
+  const handleBooking = async () => {
     if (!selectedSlot) {
-      alert("Please select a slot first.");
+      alert("Please select a time slot.");
+      return;
+    }
+
+    const patientName = localStorage.getItem("username");
+    if (!patientName) {
+      alert("Please log in or register to book an appointment.");
       return;
     }
 
     setLoading(true);
 
     try {
-      const patientName = localStorage.getItem("username");
-      if (!patientName) {
-        alert("Please log in or register to book a slot.");
-        setLoading(false);
-        return;
-      }
-
-      // Create Stripe checkout session
-      const response = await fetch("http://localhost:8000/api/create-checkout-session/", {
-        method: "POST",
+      const response = await fetch('http://localhost:8000/api/create-checkout-session/', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           booking_id: selectedSlot.booking_id,
@@ -173,13 +183,15 @@ export default function OpdDrSc() {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to create checkout session");
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to create checkout session');
       }
 
       const { checkout_url } = await response.json();
-      // Mark the slot as booked locally before redirecting
-      setSlots((prevSlots) =>
-        prevSlots.map((slot) =>
+      
+      // Update local state to show slot as pending
+      setAvailableSlots(prevSlots =>
+        prevSlots.map(slot =>
           slot.booking_id === selectedSlot.booking_id
             ? { ...slot, is_booked: true }
             : slot
@@ -188,14 +200,56 @@ export default function OpdDrSc() {
 
       // Redirect to Stripe Checkout
       window.location.href = checkout_url;
-      } catch (error) {
-      console.error("Error processing payment:", error);
-      alert("Failed to proceed to payment. Please try again.");
-      } finally {
+
+    } catch (error) {
+      console.error('Error creating checkout session:', error);
+      alert(error.message || 'Failed to process payment. Please try again.');
+    } finally {
       setLoading(false);
-      }
+    }
   };
 
+  // Update the time slots rendering
+  const renderTimeSlots = () => (
+    <div className="time-slots">
+      {availableSlots.length > 0 ? (
+        availableSlots.map((slot) => {
+          const status = bookingStatus[slot.booking_id];
+          const isBooked = slot.is_booked || (status && status.is_booked);
+          const isRefunded = status && status.refunded;
+          
+          return (
+            <div
+              key={slot.booking_id}
+              className={`time-slot ${isBooked ? "red" : "green"} ${
+                selectedSlot && selectedSlot.booking_id === slot.booking_id ? "selected" : ""
+              }`}
+              onClick={() => !isBooked && handleSlotClick(slot)}
+            >
+              <div className="time-slot-info">
+                <span>{slot.start_time} - {slot.end_time}</span>
+                {isBooked && !isRefunded && status?.patient_name === localStorage.getItem("username") && (
+                  <button 
+                    className="refund-button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRefund(slot.booking_id);
+                    }}
+                  >
+                    Cancel & Refund
+                  </button>
+                )}
+              </div>
+            </div>
+          );
+        })
+      ) : (
+        <p>No available time slots</p>
+      )}
+    </div>
+  );
+
+  // Update the return JSX
   return (
     <div className="opdDrSc-body">
       <Navbar />
@@ -334,5 +388,3 @@ export const SuccessPage = () => {
     </div>
   );
 };
-
-
