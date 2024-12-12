@@ -264,13 +264,13 @@ const GovermentSc = () => {
               <div key={scheme.id} className="userGoveSc-card">
                 <h4>{scheme.schemeName}</h4>
                 <samp>{scheme.schemeDescription.substring(0, 100)}...</samp>
-                <button
-                  className="userGoveSc-register-btn"
-                  onClick={() => openModal(scheme)}
-                >
+                <button className="userGoveSc-register-btn" onClick={() => openModal(scheme)}>
                   View
                 </button>
               </div>
+
+            
+
             ))}
           </div>
         </div>
@@ -281,39 +281,15 @@ const GovermentSc = () => {
           <div className="modal-content">
             <h2>{selectedScheme.schemeName}</h2>
             <p>{selectedScheme.schemeDescription}</p>
-            <span>
-              <strong>State:</strong> {selectedScheme.userState}
-            </span>
-            <span>
-              <strong>Age:</strong> {selectedScheme.userAge}
-            </span>
-            <span>
-              <strong>Income Group:</strong> {selectedScheme.income}
-            </span>
-            <span>
-              <strong>Gender:</strong> {selectedScheme.gender}
-            </span>
-            <span>
-              <strong>Family Size:</strong> {selectedScheme.familySize}
-            </span>
-            <span>
-              <strong>Marital Status:</strong> {selectedScheme.maritalStatus}
-            </span>
-            <br />
-            <span>
-              <strong>Health Problems:</strong> {selectedScheme.healthProblems}
-            </span>
-            <span>
-              <strong>Case:</strong> {selectedScheme.caste}
-            </span>{" "}
-            <br />
-            <br />
-            <a
-              href={selectedScheme.schemeUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="read-more-btn"
-            >
+              <span><strong>State:</strong> {selectedScheme.userState}</span>
+              <span><strong>Age:</strong> {selectedScheme.userAge}</span>
+              <span><strong>Income Group:</strong> {selectedScheme.income}</span>
+              <span><strong>Gender:</strong> {selectedScheme.gender}</span>
+              <span><strong>Family Size:</strong> {selectedScheme.familySize}</span>
+              <span><strong>Marital Status:</strong> {selectedScheme.maritalStatus}</span><br />
+              <span><strong>Health Problems:</strong> {selectedScheme.healthProblems}</span>
+              <span><strong>Case:</strong> {selectedScheme.caste}</span> <br /><br />
+            <a href={selectedScheme.schemeUrl} target="_blank" rel="noopener noreferrer" className="read-more-btn">
               Read More
             </a>
             <p className="govScmodal-close-btn" onClick={closeModal}>

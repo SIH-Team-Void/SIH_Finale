@@ -212,40 +212,37 @@ export default function OpdDrSc() {
   // Update the time slots rendering
   const renderTimeSlots = () => (
     <div className="time-slots">
-      {availableSlots.length > 0 ? (
-        availableSlots.map((slot) => {
-          const status = bookingStatus[slot.booking_id];
-          const isBooked = slot.is_booked || (status && status.is_booked);
-          const isRefunded = status && status.refunded;
-          
-          return (
-            <div
-              key={slot.booking_id}
-              className={`time-slot ${isBooked ? "red" : "green"} ${
-                selectedSlot && selectedSlot.booking_id === slot.booking_id ? "selected" : ""
-              }`}
-              onClick={() => !isBooked && handleSlotClick(slot)}
-            >
-              <div className="time-slot-info">
-                <span>{slot.start_time} - {slot.end_time}</span>
-                {isBooked && !isRefunded && status?.patient_name === localStorage.getItem("username") && (
-                  <button 
-                    className="refund-button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleRefund(slot.booking_id);
-                    }}
-                  >
-                    Cancel & Refund
-                  </button>
-                )}
-              </div>
+      {availableSlots.map((slot) => {
+        const status = bookingStatus[slot.booking_id] || {};
+        const isBooked = slot.is_booked || status.is_booked;
+        const isRefunded = status.refunded;
+        const isCurrentUserBooking = status.patient_name === localStorage.getItem("username");
+  
+        return (
+          <div
+            key={slot.booking_id}
+            className={`time-slot ${isBooked ? "red" : "green"} ${
+              selectedSlot && selectedSlot.booking_id === slot.booking_id ? "selected" : ""
+            }`}
+            onClick={() => !isBooked && handleSlotClick(slot)}
+          >
+            <div className="time-slot-info">
+              <span>{slot.start_time} - {slot.end_time}</span>
+              {isBooked && !isRefunded && isCurrentUserBooking && (
+                <button 
+                  className="refund-button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleRefund(slot.booking_id);
+                  }}
+                >
+                  Cancel & Refund
+                </button>
+              )}
             </div>
-          );
-        })
-      ) : (
-        <p>No available time slots</p>
-      )}
+          </div>
+        );
+      })}
     </div>
   );
 
