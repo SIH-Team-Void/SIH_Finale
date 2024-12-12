@@ -228,10 +228,10 @@ const Inventory = () => {
     return new Date(expiryDate) < new Date();
   };
 
-  const expiredItems = inventory.filter((item) => isExpired(item.expiry_date));
+  const expiredItems = inventory.filter((item) => isExpired(item.Inv_expiry_date));
   const lowStockItems = inventory.filter((item) => item.Inv_quantity < 10);
   const normalItems = inventory.filter(
-    (item) => !isExpired(item.expiry_date) && item.Inv_quantity >= 10
+    (item) => !isExpired(item.Inv_expiry_date) && item.Inv_quantity >= 10
   );
 
   // Render inventory table
@@ -394,8 +394,8 @@ const Inventory = () => {
               <label htmlFor="expiry_date">Expiry Date</label>
               <input
                 type="date"
-                name="expiry_date"
-                value={formData.expiry_date}
+                name="Inv_expiry_date"
+                value={formData.Inv_expiry_date}
                 onChange={handleChange}
                 required
               />

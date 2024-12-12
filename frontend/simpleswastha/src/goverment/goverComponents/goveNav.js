@@ -26,6 +26,7 @@ export default function GoveNav() {
         <Link to="/government" className="goveNav-active">Home</Link>
         <Link to="/government/map">DCMS</Link>
         <Link to="/government/schemes">Government Schemes</Link>
+        <Link to="/government/centralPa">Centralized Patient History</Link>
         <button className="goveNav-helpButton" onClick={toggleNotifications}>
           <img src={noti} alt="Simple Svastha" /> <samp>NOTIFICATION</samp>
         </button>

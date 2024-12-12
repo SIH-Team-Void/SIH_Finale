@@ -147,10 +147,10 @@ const Login = () => {
         </div>
         <p className="tagline">A one stop solution for all your <b>Health Related</b> Problems.</p>
         <p>आप सभी के लिए एक वन स्टॉप समाधान <b>स्वास्थ्य संबंधित</b> समस्याएँ</p>
-        <button onClick={handleChatbotToggle}>
+        {/* <button onClick={handleChatbotToggle}>
           <img src={chatbotImg} alt="chatbot_img" /> 
           <div className="chatbot">AI CHAT-BOT ASSISTANCE</div>
-        </button>
+        </button> */}
       </div>
       <div className="right-container">
         {activeTab === 'signup' && <p id="reg-log"><b>REGISTER</b> TO GET STARTED</p>}

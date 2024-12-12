@@ -10,14 +10,13 @@ export default function OpdSc() {
   const [department, setDepartment] = useState('');
   const [slots, setSlots] = useState([]);
   const [filteredSlots, setFilteredSlots] = useState([]);
-  const [departments, setDepartments] = useState([]); // New state for departments
+  const [departments, setDepartments] = useState([]);
 
-  // Fetch slots from the API
   useEffect(() => {
     const fetchSlots = async () => {
       try {
         const response = await axios.get('http://localhost:8000/api/bookings/');
-        setSlots(response.data); // 'doctor_name' will be included in the response
+        setSlots(response.data);
       } catch (error) {
         console.error('Error fetching bookings:', error);
       }
@@ -26,15 +25,11 @@ export default function OpdSc() {
     fetchSlots();
   }, []);
 
-  // Fetch departments from the API (new useEffect for departments)
   useEffect(() => {
     const fetchDepartments = async () => {
       try {
         const response = await axios.get('http://localhost:8000/api/doctors/');
-        // Assuming the department data is included in the response
-        const uniqueDepartments = [
-          ...new Set(response.data.map((doctor) => doctor.department)),
-        ];
+        const uniqueDepartments = [...new Set(response.data.map((doctor) => doctor.department))];
         setDepartments(uniqueDepartments);
       } catch (error) {
         console.error('Error fetching departments:', error);
@@ -44,12 +39,14 @@ export default function OpdSc() {
     fetchDepartments();
   }, []);
 
-  // Update booking status and details
-  const updateSlot = async (slotId, updatedData) => {
+  const updateSlot = async (slotId) => {
+    const patientName = prompt('Enter the name of the patient:');
+    if (!patientName) return;
+
     try {
       const response = await axios.put(`http://localhost:8000/api/bookings/${slotId}/`, {
-        ...updatedData,
-        is_booked: true, // Mark the slot as booked
+        patient_name: patientName,
+        is_booked: true,
       });
       const updatedSlots = slots.map((slot) =>
         slot.booking_id === slotId ? response.data : slot
@@ -60,8 +57,9 @@ export default function OpdSc() {
     }
   };
 
-  // Delete booking
   const deleteSlot = async (slotId) => {
+    if (!window.confirm('Are you sure you want to delete this booking?')) return;
+
     try {
       await axios.delete(`http://localhost:8000/api/bookings/${slotId}/`);
       const updatedSlots = slots.filter((slot) => slot.booking_id !== slotId);
@@ -71,20 +69,19 @@ export default function OpdSc() {
     }
   };
 
-  // Handle filter changes for date, doctor, and department
   const handleFilterChange = () => {
     const filtered = slots.filter((slot) => {
       return (
         (date ? slot.date === date : true) &&
-        (doctor ? slot.doctor_name.toLowerCase().includes(doctor.toLowerCase()) : true) &&
-        (department ? slot.department.toLowerCase().includes(department.toLowerCase()) : true)
+        (doctor ? `Dr. ${slot.doctor_name}`.toLowerCase().includes(doctor.toLowerCase()) : true) &&
+        (department ? slot.department?.toLowerCase().includes(department.toLowerCase()) : true)
       );
     });
 
-    setFilteredSlots(filtered);
+    const sortedFiltered = filtered.sort((a, b) => (a.is_booked === b.is_booked ? 0 : a.is_booked ? -1 : 1));
+    setFilteredSlots(sortedFiltered);
   };
 
-  // Run filtering whenever slots, date, doctor, or department change
   useEffect(() => {
     handleFilterChange();
   }, [date, doctor, department, slots]);
@@ -126,7 +123,7 @@ export default function OpdSc() {
                   onChange={(e) => setDoctor(e.target.value)}
                 >
                   <option value="">All Doctors</option>
-                  {[...new Set(slots.map((slot) => slot.doctor_name))].map((doctorOption) => (
+                  {[...new Set(slots.map((slot) => `Dr. ${slot.doctor_name}`))].map((doctorOption) => (
                     <option key={doctorOption} value={doctorOption}>
                       {doctorOption}
                     </option>
@@ -164,7 +161,6 @@ export default function OpdSc() {
                   <th>Date</th>
                   <th>Start Time</th>
                   <th>End Time</th>
-                  <th>Status</th>
                   <th>Patient Name</th>
                   <th>Actions</th>
                 </tr>
@@ -172,25 +168,28 @@ export default function OpdSc() {
               <tbody>
                 {filteredSlots.map((slot) => (
                   <tr key={slot.booking_id}>
-                    <td>{slot.doctor_name}</td>
+                    <td>{`Dr. ${slot.doctor_name}`}</td>
                     <td>{slot.date}</td>
                     <td>{slot.start_time}</td>
                     <td>{slot.end_time}</td>
-                    <td>{slot.is_booked ? 'Booked' : 'Vacant'}</td>
-                    <td>{slot.patient_name || 'N/A'}</td>
+                    <td>{slot.patient_name || ''}</td>
                     <td className="opdSc-actions">
                       <div className="opdSc-status-input">
-                        <input type="text" value={slot.is_booked ? 'Booked' : 'Vacant'} readOnly />
-                        <input type="text" value={slot.patient_name || 'N/A'} readOnly />
                         <button
                           className="opdSc-update-btn"
-                          onClick={() => updateSlot(slot.booking_id, { patient_name: 'John Doe' })}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            updateSlot(slot.booking_id);
+                          }}
                         >
                           Update
                         </button>
                         <button
                           className="opdSc-delete-btn"
-                          onClick={() => deleteSlot(slot.booking_id)}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            deleteSlot(slot.booking_id);
+                          }}
                         >
                           Delete
                         </button>

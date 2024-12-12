@@ -52,6 +52,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False) 
     is_superuser = models.BooleanField(default=False)
     created_at = models.DateTimeField(default=timezone.now)
+    aadhar = models.IntegerField(max_length=12, null=True, unique=True)
 
     objects = UserManager()
 
