@@ -45,7 +45,7 @@ class Inventory(models.Model):
     Inv_category =models.CharField(max_length=50, choices=CATEGORY_CHOICES, null=False, blank=False)
     Inv_subcategory = models.CharField(max_length=50, null=True, blank=True)
     batch_number = models.CharField(max_length=50, null=True, blank=True, unique=True) # Optional, e.g., "surgical" or "medicines"
-    expiry_date= models.DateField(null=True,blank=True)
+    # expiry_date= models.DateField(null=True,blank=True)
     Inv_vendor = models.CharField(max_length=50, null=True, blank=True)
 
     def clean(self):

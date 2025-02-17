@@ -73,7 +73,7 @@ export default function OpdDrSc() {
 
   const verifyBookingStatus = async (bookingId) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/verify-booking-status/${bookingId}/`);
+      const response = await fetch(`http://localhost:8000/api/bookings/${bookingId}/`);
       if (response.ok) {
         const data = await response.json();
         setBookingStatus(prev => ({
@@ -111,7 +111,7 @@ export default function OpdDrSc() {
         const slots = Array.isArray(data) ? data : [];
         setAvailableSlots(slots);
 
-        // Fetch status for all slots
+       
         slots.forEach(slot => {
           verifyBookingStatus(slot.booking_id);
         });
